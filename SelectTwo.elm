@@ -8,6 +8,7 @@ import Tuple
 import Tuple3
 import Dom
 import Http
+import Html exposing (text)
 import Helpers exposing (closest, px)
 
 
@@ -176,7 +177,7 @@ filterGroup filter list =
 
 
 filterList : Maybe String -> SelectTwoOption a -> Bool
-filterList filter ( _, text ) =
+filterList filter ( _, _, text ) =
     case filter of
         Just f ->
             String.contains (f |> String.toLower) (text |> String.toLower)
@@ -291,7 +292,7 @@ selectGroup msg list =
 
 selectOption : (a -> msg) -> ( a, String ) -> SelectTwoOption msg
 selectOption msg ( val, txt ) =
-    ( Just (msg val), txt )
+    ( Just (msg val), text txt, txt )
 
 
 preventScrolling : String -> Maybe (SelectTwo msg) -> List ( String, String )
@@ -312,7 +313,7 @@ preventScrolling name selectTwo =
 widthGuess : Float -> List (SelectTwoOption msg) -> String
 widthGuess font list =
     (list
-        |> List.map (\( _, x ) -> x)
+        |> List.map (\( _, _, x ) -> x)
         |> List.map (String.length)
         |> List.maximum
         |> Maybe.withDefault 0

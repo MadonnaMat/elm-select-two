@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Html exposing (Html, program, text, div)
+import Html exposing (Html, program, text, div, span)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import SelectTwo exposing (..)
@@ -8,6 +8,7 @@ import SelectTwo.Html exposing (..)
 import SelectTwoTypes exposing (..)
 import Task
 import Json.Decode as JD
+import Helpers exposing ((=>))
 
 
 type alias Model =
@@ -100,6 +101,7 @@ view model =
                 , showSearch = True
                 , width = "300px"
                 , placeholder = "Select Test"
+                , disabled = model.test2 == Just "a"
                 }
             ]
         , div []
@@ -112,22 +114,24 @@ view model =
                 , showSearch = True
                 , width = "300px"
                 , placeholder = "Select Test"
+                , disabled = False
                 }
             ]
         , div []
             [ select2Multiple SelectTwo
                 { defaults = model.test3 |> List.map Test3
-                , list = testList Test3
+                , list = testList3 Test3
                 , id_ = "test-3"
                 , parents = [ "parent" ]
                 , clearMsg = Test3Clear
                 , width = "300px"
                 , placeholder = "Select Test"
+                , disabled = model.test2 == Just "a"
                 }
             ]
         , div []
             [ select2Ajax SelectTwo
-                { default = model.test4 |> Maybe.map (\t -> ( Just (Test4 (Just t)), t.name )) |> Maybe.withDefault ( Nothing, "" )
+                { default = model.test4 |> Maybe.map (\t -> ( Just (Test4 (Just t)), text t.name, t.name )) |> Maybe.withDefault ( Nothing, text "", "" )
                 , url = "//api.github.com/search/repositories"
                 , data =
                     (\( url, params ) ->
@@ -147,6 +151,7 @@ view model =
                 , showSearch = True
                 , width = "300px"
                 , placeholder = "Select Test"
+                , disabled = model.test2 == Just "a"
                 }
             ]
         , select2Dropdown model
@@ -199,3 +204,32 @@ testList msg =
 testList2 : (Maybe String -> Msg) -> List ( String, List (SelectTwoOption Msg) )
 testList2 msg =
     [ ( Just "a", "a", "a" ), ( Just "b", "b", "a" ), ( Just "c", "c", "b" ) ] |> SelectTwo.basicGroupSelectOptions msg
+
+
+testList3 : (Maybe String -> msg) -> List (GroupSelectTwoOption msg)
+testList3 msg =
+    ( ""
+    , [ ( Just "a", "a" )
+      , ( Just "b", "b" )
+      , ( Just "c", "c" )
+      , ( Just "d", "Decons Chons" )
+      , ( Just "e", "Fangroana" )
+      , ( Just "f", "Ender's Game" )
+      ]
+        |> List.map
+            (\( a, b ) ->
+                ( Just (msg a)
+                , span
+                    [ style
+                        [ "width" => "100%"
+                        , "text-align" => "center"
+                        , "display" => "inline-block"
+                        ]
+                    ]
+                    [ text b
+                    ]
+                , b
+                )
+            )
+    )
+        :: []

@@ -2,6 +2,7 @@ module SelectTwoTypes exposing (..)
 
 import Dom
 import Http
+import Html exposing (Html)
 
 
 type SelectTwoMsg a
@@ -25,6 +26,7 @@ type alias SelectTwoConfig a =
     , showSearch : Bool
     , width : String
     , placeholder : String
+    , disabled : Bool
     }
 
 
@@ -39,6 +41,7 @@ type alias SelectTwoAjaxConfig a =
     , showSearch : Bool
     , width : String
     , placeholder : String
+    , disabled : Bool
     }
 
 
@@ -50,6 +53,7 @@ type alias SelectTwoMultipleConfig a =
     , clearMsg : a -> a
     , width : String
     , placeholder : String
+    , disabled : Bool
     }
 
 
@@ -66,7 +70,7 @@ type alias GroupSelectTwoOption a =
 
 
 type alias SelectTwoOption a =
-    ( Maybe a, String )
+    ( Maybe a, Html a, String )
 
 
 type alias SelectTwo a =

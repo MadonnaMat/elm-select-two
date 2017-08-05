@@ -8,6 +8,7 @@ import SelectTwo
 import SelectTwoTypes exposing (..)
 import Helpers exposing ((=>), px)
 import Json.Decode as JD
+import Tuple3
 
 
 select2Css : Html msg
@@ -21,21 +22,27 @@ select2Close sender =
 
 
 select2 : (SelectTwoMsg msg -> msg) -> SelectTwoConfig msg -> Html msg
-select2 sender { default, list, parents, clearMsg, showSearch, width, placeholder, id_ } =
+select2 sender { default, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled } =
     let
-        ( _, defaultText ) =
-            list |> List.concatMap (\( _, l ) -> l) |> List.Extra.find (\( msg, _ ) -> msg == Just default) |> Maybe.withDefault ( Nothing, "" )
+        ( _, defaultText, _ ) =
+            list |> List.concatMap (\( _, l ) -> l) |> List.Extra.find (\( msg, _, _ ) -> msg == Just default) |> Maybe.withDefault ( Nothing, text "", "" )
     in
         span
-            [ class "select2 select2-container select2-container--default select2-container--below select2-container--focus"
+            [ classList
+                [ "select2 select2-container select2-container--default select2-container--below select2-container--focus" => True
+                , "select2-container--disabled" => disabled
+                ]
             , id id_
             , style [ "width" => width ]
-            , Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.location id_ sender [ default ] list parents showSearch)
+            , if not disabled then
+                Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.location id_ sender [ default ] list parents showSearch)
+              else
+                attribute "data-blank" ""
             ]
             [ span [ class "selection" ]
                 [ span [ class "select2-selection select2-selection--single" ]
                     [ span [ class "select2-selection__rendered" ]
-                        [ if defaultText == "" then
+                        [ if defaultText == text "" then
                             span [ class "select2-selection__placeholder" ] [ text placeholder ]
                           else
                             case clearMsg of
@@ -44,7 +51,7 @@ select2 sender { default, list, parents, clearMsg, showSearch, width, placeholde
 
                                 Nothing ->
                                     text ""
-                        , text defaultText
+                        , defaultText
                         ]
                     , span [ class "select2-selection__arrow" ] [ b [] [] ]
                     ]
@@ -53,21 +60,27 @@ select2 sender { default, list, parents, clearMsg, showSearch, width, placeholde
 
 
 select2Ajax : (SelectTwoMsg msg -> msg) -> SelectTwoAjaxConfig msg -> Html msg
-select2Ajax sender { default, url, data, processResults, parents, clearMsg, showSearch, width, placeholder, id_ } =
+select2Ajax sender { default, url, data, processResults, parents, clearMsg, showSearch, width, placeholder, id_, disabled } =
     let
-        ( defaultMsg, defaultText ) =
+        ( defaultMsg, defaultText, _ ) =
             default
     in
         span
-            [ class "select2 select2-container select2-container--default select2-container--below select2-container--focus"
+            [ classList
+                [ "select2 select2-container select2-container--default select2-container--below select2-container--focus" => True
+                , "select2-container--disabled" => disabled
+                ]
             , id id_
             , style [ "width" => width ]
-            , Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.ajaxLocation id_ sender [ defaultMsg |> Maybe.withDefault (sender STNull) ] parents showSearch url data processResults)
+            , if not disabled then
+                Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.ajaxLocation id_ sender [ defaultMsg |> Maybe.withDefault (sender STNull) ] parents showSearch url data processResults)
+              else
+                attribute "data-blank" ""
             ]
             [ span [ class "selection" ]
                 [ span [ class "select2-selection select2-selection--single" ]
                     [ span [ class "select2-selection__rendered" ]
-                        [ if defaultText == "" then
+                        [ if defaultText == text "" then
                             span [ class "select2-selection__placeholder" ] [ text placeholder ]
                           else
                             case clearMsg of
@@ -76,7 +89,7 @@ select2Ajax sender { default, url, data, processResults, parents, clearMsg, show
 
                                 Nothing ->
                                     text ""
-                        , text defaultText
+                        , defaultText
                         ]
                     , span [ class "select2-selection__arrow" ] [ b [] [] ]
                     ]
@@ -85,26 +98,32 @@ select2Ajax sender { default, url, data, processResults, parents, clearMsg, show
 
 
 select2Multiple : (SelectTwoMsg msg -> msg) -> SelectTwoMultipleConfig msg -> Html msg
-select2Multiple sender { defaults, list, parents, clearMsg, width, placeholder, id_ } =
+select2Multiple sender { defaults, list, parents, clearMsg, width, placeholder, id_, disabled } =
     span
-        [ class "select2 select2-container select2-container--default select2-container--below select2-container--focus"
+        [ classList
+            [ "select2 select2-container select2-container--default select2-container--below select2-container--focus" => True
+            , "select2-container--disabled" => disabled
+            ]
         , style [ "width" => width ]
         , id id_
-        , Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.location id_ sender defaults list parents False)
+        , if not disabled then
+            Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.location id_ sender defaults list parents False)
+          else
+            attribute "data-blank" ""
         ]
         [ span [ class "selection" ]
             [ span [ class "select2-selection select2-selection--multiple" ]
                 [ ul [ class "select2-selection__rendered" ]
                     ((list
                         |> List.concatMap Tuple.second
-                        |> List.filter (\l -> defaults |> List.map Just |> List.member (Tuple.first l))
+                        |> List.filter (\l -> defaults |> List.map Just |> List.member (Tuple3.first l))
                         |> List.map
-                            (\( msg, txt ) ->
+                            (\( msg, txt, _ ) ->
                                 case msg of
                                     Just ms ->
                                         li [ class "select2-selection__choice" ]
                                             [ span [ class "select2-selection__choice__remove", onClick (sender (STMsg (clearMsg ms))) ] [ text "×" ]
-                                            , text txt
+                                            , txt
                                             ]
 
                                     Nothing ->
@@ -112,18 +131,21 @@ select2Multiple sender { defaults, list, parents, clearMsg, width, placeholder, 
                             )
                      )
                         ++ [ li [ class "select2-search select2-search--inline" ]
-                                [ input
-                                    [ class "select2-search__field"
-                                    , onInput (SetSelectTwoSearch >> sender)
-                                    , id (id_ ++ "--search")
-                                    , Html.Attributes.placeholder
-                                        (if (defaults |> List.length) > 0 then
-                                            ""
-                                         else
-                                            placeholder
-                                        )
-                                    ]
-                                    []
+                                [ if not disabled then
+                                    input
+                                        [ class "select2-search__field"
+                                        , onInput (SetSelectTwoSearch >> sender)
+                                        , id (id_ ++ "--search")
+                                        , Html.Attributes.placeholder
+                                            (if (defaults |> List.length) > 0 then
+                                                ""
+                                             else
+                                                placeholder
+                                            )
+                                        ]
+                                        []
+                                  else
+                                    text ""
                                 ]
                            ]
                     )
@@ -218,7 +240,7 @@ select2ListGroup sender defaults hovered ( label, list ) =
 
 
 select2ListItem : (SelectTwoMsg msg -> msg) -> List msg -> Maybe msg -> SelectTwoOption msg -> Html msg
-select2ListItem sender defaults hovered ( msg, display ) =
+select2ListItem sender defaults hovered ( msg, display, _ ) =
     li
         [ classList
             [ "select2-results__option" => True
@@ -228,7 +250,7 @@ select2ListItem sender defaults hovered ( msg, display ) =
         , Html.Events.onMouseOver (sender (SelectTwoHovered msg))
         , onClick (sender (SelectTwoSelected msg))
         ]
-        [ text display ]
+        [ display ]
 
 
 preventAndStop : { preventDefault : Bool, stopPropagation : Bool }

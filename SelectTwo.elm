@@ -1,9 +1,12 @@
-module SelectTwo exposing (update, new, map, setFilter, filterList, location, basicSelectOptions, preventScrolling, widthGuess)
+module SelectTwo exposing (update, new, map, setFilter, filterList, filterGroup, location, basicSelectOptions, basicGroupSelectOptions, preventScrolling, widthGuess)
 
-import SelectTwoTypes exposing (SelectTwoMsg(..), SelectTwo, SelectTwoDropdown, SelectTwoOption)
+import SelectTwoTypes exposing (SelectTwoMsg(..), SelectTwo, SelectTwoDropdown, SelectTwoOption, GroupSelectTwoOption)
 import Json.Decode as JD
 import List.Extra
 import Task
+import Tuple
+import Tuple3
+import Dom
 import Helpers exposing (closest, px)
 
 
@@ -11,7 +14,12 @@ update : SelectTwoMsg msg -> { b | selectTwo : Maybe (SelectTwo msg) } -> ( { b 
 update msg model =
     case msg of
         SelectTwoTrigger p dd ->
-            new p dd model ! []
+            let
+                sender =
+                    dd
+                        |> dropdownSender
+            in
+                new p dd model ! [ Dom.focus ((dd |> dropdownId) ++ "--search") |> Task.attempt (STRes >> sender) ]
 
         SelectTwoHovered hovered ->
             map (\s -> { s | hovered = hovered }) model ! []
@@ -24,6 +32,12 @@ update msg model =
 
         STMsg msg ->
             model ! [ send msg ]
+
+        STRes a ->
+            model ! []
+
+        STNull ->
+            model ! []
 
 
 new : List String -> SelectTwoDropdown a -> { b | selectTwo : Maybe (SelectTwo a) } -> { b | selectTwo : Maybe (SelectTwo a) }
@@ -50,6 +64,21 @@ setFilter filter =
                 Just filter
     in
         map (\s -> { s | search = search })
+
+
+dropdownId : SelectTwoDropdown a -> String
+dropdownId ( id_, _, _, _, _, _, _, _ ) =
+    id_
+
+
+dropdownSender : SelectTwoDropdown a -> SelectTwoMsg a -> a
+dropdownSender ( _, sender, _, _, _, _, _, _ ) =
+    sender
+
+
+filterGroup : Maybe String -> GroupSelectTwoOption a -> GroupSelectTwoOption a
+filterGroup filter list =
+    list |> Tuple.mapSecond (List.filter (filterList filter))
 
 
 filterList : Maybe String -> SelectTwoOption a -> Bool
@@ -87,8 +116,8 @@ parentSize dir oldParents =
                 JD.field "scrollTop" JD.float
 
 
-location : (SelectTwoMsg msg -> msg) -> msg -> List (SelectTwoOption msg) -> List String -> Bool -> JD.Decoder msg
-location sender default list parents showSearch =
+location : String -> (SelectTwoMsg msg -> msg) -> List msg -> List (GroupSelectTwoOption msg) -> List String -> Bool -> JD.Decoder msg
+location id_ sender defaults list parents showSearch =
     JD.map2 (,)
         (JD.map2 (,)
             (JD.map2 (+)
@@ -104,19 +133,35 @@ location sender default list parents showSearch =
             )
         )
         (JD.at [ "offsetWidth" ] JD.float)
-        |> JD.map (buildDropdown sender default list showSearch)
+        |> JD.map (buildDropdown id_ sender defaults list showSearch)
         |> JD.map ((SelectTwoTrigger parents) >> sender)
         |> (JD.field "target" << closest "select2")
 
 
-buildDropdown : (SelectTwoMsg msg -> msg) -> msg -> List (SelectTwoOption msg) -> Bool -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
-buildDropdown sender default list showSearch ( ( x, y ), width ) =
-    ( sender, default, list, showSearch, x, y, width )
+buildDropdown : String -> (SelectTwoMsg msg -> msg) -> List msg -> List (GroupSelectTwoOption msg) -> Bool -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
+buildDropdown id_ sender defaults list showSearch ( ( x, y ), width ) =
+    ( id_, sender, defaults, list, showSearch, x, y, width )
 
 
-basicSelectOptions : (a -> msg) -> List ( a, String ) -> List (SelectTwoOption msg)
-basicSelectOptions msg =
-    List.map (selectOption msg)
+basicSelectOptions : (a -> msg) -> List ( a, String ) -> List (GroupSelectTwoOption msg)
+basicSelectOptions msg list =
+    [ ( "", List.map (selectOption msg) list ) ]
+
+
+basicGroupSelectOptions : (a -> msg) -> List ( a, String, String ) -> List (GroupSelectTwoOption msg)
+basicGroupSelectOptions msg list =
+    list
+        |> List.Extra.groupWhile (\( _, _, a ) ( _, _, b ) -> a == b)
+        |> List.map (selectGroup msg)
+
+
+selectGroup : (a -> msg) -> List ( a, String, String ) -> GroupSelectTwoOption msg
+selectGroup msg list =
+    let
+        group =
+            list |> List.head |> Maybe.map Tuple3.third |> Maybe.withDefault ""
+    in
+        ( group, List.map (\( a, b, _ ) -> selectOption msg ( a, b )) list )
 
 
 selectOption : (a -> msg) -> ( a, String ) -> SelectTwoOption msg

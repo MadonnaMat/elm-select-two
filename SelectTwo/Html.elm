@@ -1,4 +1,4 @@
-module SelectTwo.Html exposing (select2, select2Multiple, select2Dropdown, select2Css, select2Close)
+module SelectTwo.Html exposing (select2, select2Multiple, select2Ajax, select2Dropdown, select2Css, select2Close)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -31,6 +31,38 @@ select2 sender { default, list, parents, clearMsg, showSearch, width, placeholde
             , id id_
             , style [ "width" => width ]
             , Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.location id_ sender [ default ] list parents showSearch)
+            ]
+            [ span [ class "selection" ]
+                [ span [ class "select2-selection select2-selection--single" ]
+                    [ span [ class "select2-selection__rendered" ]
+                        [ if defaultText == "" then
+                            span [ class "select2-selection__placeholder" ] [ text placeholder ]
+                          else
+                            case clearMsg of
+                                Just msg ->
+                                    span [ class "select2-selection__clear", onClick (sender (STMsg msg)) ] [ text "×" ]
+
+                                Nothing ->
+                                    text ""
+                        , text defaultText
+                        ]
+                    , span [ class "select2-selection__arrow" ] [ b [] [] ]
+                    ]
+                ]
+            ]
+
+
+select2Ajax : (SelectTwoMsg msg -> msg) -> SelectTwoAjaxConfig msg -> Html msg
+select2Ajax sender { default, url, data, processResults, parents, clearMsg, showSearch, width, placeholder, id_ } =
+    let
+        ( defaultMsg, defaultText ) =
+            default
+    in
+        span
+            [ class "select2 select2-container select2-container--default select2-container--below select2-container--focus"
+            , id id_
+            , style [ "width" => width ]
+            , Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.ajaxLocation id_ sender [ defaultMsg |> Maybe.withDefault (sender STNull) ] parents showSearch url data processResults)
             ]
             [ span [ class "selection" ]
                 [ span [ class "select2-selection select2-selection--single" ]
@@ -97,43 +129,60 @@ select2Multiple sender { defaults, list, parents, clearMsg, width, placeholder, 
 select2Dropdown : { b | selectTwo : Maybe (SelectTwo msg) } -> Html msg
 select2Dropdown model =
     case model.selectTwo of
-        Just { dropdown, hovered, search } ->
-            select2DropdownDraw dropdown hovered search
+        Just { dropdown, hovered, search, list, ajaxStuff } ->
+            select2DropdownDraw dropdown hovered search list ajaxStuff
 
         Nothing ->
             text ""
 
 
-select2DropdownDraw : SelectTwoDropdown msg -> Maybe msg -> Maybe String -> Html msg
-select2DropdownDraw ( id_, sender, defaults, list, showSearch, x, y, width ) hovered search =
-    span
-        [ class "select2-container select2-container--default select2-container--open"
-        , style
-            [ "position" => "absolute"
-            , "left" => px x
-            , "top" => px y
-            , "width" => px width
-            ]
-        ]
-        [ span [ class "select2-dropdown select2-dropdown--below" ]
-            [ if showSearch == True then
-                span [ class "select2-search select2-search--dropdown" ]
-                    [ input
-                        [ class "select2-search__field"
-                        , id (id_ ++ "--search")
-                        , onInput (SetSelectTwoSearch >> sender)
-                        , Html.Events.onWithOptions "click" preventAndStop (JD.succeed (sender STNull))
-                        ]
-                        []
-                    ]
-              else
-                text ""
-            , span [ class "select2-results" ]
-                [ ul [ class "select2-results__options" ]
-                    (listOrGroup sender defaults list hovered search)
+select2DropdownDraw : SelectTwoDropdown msg -> Maybe msg -> Maybe String -> Maybe (List (GroupSelectTwoOption msg)) -> Maybe (SelectTwoAjaxStuff msg) -> Html msg
+select2DropdownDraw ( id_, sender, defaults, list, showSearch, x, y, width, _ ) hovered search ajaxList ajaxStuff =
+    let
+        theList =
+            case ajaxList of
+                Just l ->
+                    l
+
+                Nothing ->
+                    list
+    in
+        span
+            [ class "select2-container select2-container--default select2-container--open"
+            , style
+                [ "position" => "absolute"
+                , "left" => px x
+                , "top" => px y
+                , "width" => px width
                 ]
             ]
-        ]
+            [ span [ class "select2-dropdown select2-dropdown--below" ]
+                [ if showSearch == True then
+                    span [ class "select2-search select2-search--dropdown" ]
+                        [ input
+                            [ class "select2-search__field"
+                            , id (id_ ++ "--search")
+                            , onInput (SetSelectTwoSearch >> sender)
+                            , Html.Events.onWithOptions "click" preventAndStop (JD.succeed (sender STNull))
+                            ]
+                            []
+                        ]
+                  else
+                    text ""
+                , span [ class "select2-results" ]
+                    [ ul [ class "select2-results__options", Html.Events.on "scroll" <| scrollPosition (ResultScroll >> sender) ]
+                        (listOrGroup sender defaults theList hovered search)
+                    ]
+                ]
+            ]
+
+
+scrollPosition : (ScrollInfo -> a) -> JD.Decoder a
+scrollPosition wrapper =
+    JD.map2 ScrollInfo
+        (JD.at [ "target", "scrollHeight" ] JD.int)
+        (JD.at [ "target", "scrollTop" ] JD.int)
+        |> JD.map wrapper
 
 
 listOrGroup : (SelectTwoMsg msg -> msg) -> List msg -> List (GroupSelectTwoOption msg) -> Maybe msg -> Maybe String -> List (Html msg)

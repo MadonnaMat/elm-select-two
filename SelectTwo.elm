@@ -40,8 +40,18 @@ update msg model =
 
                 ( list, newParams ) =
                     processResults ( str, sendParams )
+
+                newList =
+                    (prevList ++ list)
+                        |> List.Extra.groupWhile (\x y -> Tuple.first x == Tuple.first y)
+                        |> List.map
+                            (\l ->
+                                ( l |> List.head |> Maybe.map Tuple.first |> Maybe.withDefault ""
+                                , l |> List.map (Tuple.second) |> List.concat
+                                )
+                            )
             in
-                map (\s -> { s | list = Just (prevList ++ list), ajaxStuff = Just ( url, data, processResults, newParams ) }) model ! []
+                map (\s -> { s | list = Just newList, ajaxStuff = Just ( url, data, processResults, newParams ) }) model ! []
 
         SelectTwoAjax ajaxStuff (Err str) ->
             map (\s -> { s | list = Nothing, ajaxStuff = Just ajaxStuff }) model ! []

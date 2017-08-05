@@ -116,6 +116,12 @@ select2Multiple sender { defaults, list, parents, clearMsg, width, placeholder, 
                                     [ class "select2-search__field"
                                     , onInput (SetSelectTwoSearch >> sender)
                                     , id (id_ ++ "--search")
+                                    , Html.Attributes.placeholder
+                                        (if (defaults |> List.length) > 0 then
+                                            ""
+                                         else
+                                            placeholder
+                                        )
                                     ]
                                     []
                                 ]

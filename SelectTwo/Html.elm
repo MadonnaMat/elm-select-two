@@ -42,7 +42,7 @@ select2 sender { defaults, list, parents, clearMsg, showSearch, width, placehold
         ]
         [ span [ class "selection" ]
             [ if multiSelect then
-                multiSelectSpan sender id_ defaults list clearMsg disabled placeholder
+                multiSelectSpan sender id_ defaults list clearMsg disabled placeholder url
               else
                 singleSelectSpan sender (defaults |> List.head) clearMsg placeholder
             ]
@@ -72,46 +72,55 @@ singleSelectSpan sender default clearMsg placeholder =
             ]
 
 
-multiSelectSpan : (SelectTwoMsg msg -> msg) -> String -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> Bool -> String -> Html msg
-multiSelectSpan sender id_ defaults list clearMsg disabled placeholder =
-    span [ class "select2-selection select2-selection--multiple" ]
-        [ ul [ class "select2-selection__rendered" ]
-            ((list
-                |> List.concatMap Tuple.second
-                |> List.filter (flip List.member defaults)
-                |> List.map
-                    (\( msg, txt, _ ) ->
-                        li [ class "select2-selection__choice" ]
-                            [ case clearMsg of
-                                Just clrMsg ->
-                                    span [ class "select2-selection__choice__remove", onClick (sender (STMsg (clrMsg msg))) ] [ text "×" ]
+multiSelectSpan : (SelectTwoMsg msg -> msg) -> String -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> Bool -> String -> Maybe String -> Html msg
+multiSelectSpan sender id_ defaults list clearMsg disabled placeholder url =
+    let
+        theList =
+            case url of
+                Just u ->
+                    [ ( "", defaults ) ]
 
-                                Nothing ->
-                                    text ""
-                            , txt
-                            ]
-                    )
-             )
-                ++ [ li [ class "select2-search select2-search--inline" ]
-                        [ if not disabled then
-                            input
-                                [ class "select2-search__field"
-                                , onInput (SetSelectTwoSearch >> sender)
-                                , id (id_ ++ "--search")
-                                , Html.Attributes.placeholder
-                                    (if (defaults |> List.length) > 0 then
-                                        ""
-                                     else
-                                        placeholder
-                                    )
+                _ ->
+                    list
+    in
+        span [ class "select2-selection select2-selection--multiple" ]
+            [ ul [ class "select2-selection__rendered" ]
+                ((theList
+                    |> List.concatMap Tuple.second
+                    |> List.filter (flip List.member defaults)
+                    |> List.map
+                        (\( msg, txt, _ ) ->
+                            li [ class "select2-selection__choice" ]
+                                [ case clearMsg of
+                                    Just clrMsg ->
+                                        span [ class "select2-selection__choice__remove", onClick (sender (STMsg (clrMsg msg))) ] [ text "×" ]
+
+                                    Nothing ->
+                                        text ""
+                                , txt
                                 ]
-                                []
-                          else
-                            text ""
-                        ]
-                   ]
-            )
-        ]
+                        )
+                 )
+                    ++ [ li [ class "select2-search select2-search--inline" ]
+                            [ if not disabled then
+                                input
+                                    [ class "select2-search__field"
+                                    , onInput (SetSelectTwoSearch >> sender)
+                                    , id (id_ ++ "--search")
+                                    , Html.Attributes.placeholder
+                                        (if (defaults |> List.length) > 0 then
+                                            ""
+                                         else
+                                            placeholder
+                                        )
+                                    ]
+                                    []
+                              else
+                                text ""
+                            ]
+                       ]
+                )
+            ]
 
 
 select2Dropdown : { b | selectTwo : Maybe (SelectTwo msg) } -> Html msg

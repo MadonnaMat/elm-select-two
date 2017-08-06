@@ -18,6 +18,7 @@ type alias Model =
     , test2 : Maybe String
     , test3 : List (Maybe String)
     , test4 : Maybe { id : Int, name : String }
+    , test5 : List { id : Int, name : String }
     }
 
 
@@ -28,6 +29,7 @@ init =
     , test2 = Nothing
     , test3 = []
     , test4 = Nothing
+    , test5 = []
     }
         ! []
 
@@ -37,8 +39,10 @@ type Msg
     | Test2 (Maybe String)
     | Test3 (Maybe String)
     | Test4 (Maybe { id : Int, name : String })
+    | Test5 (Maybe { id : Int, name : String })
     | SelectTwo (SelectTwoMsg Msg)
     | Test3Clear (Maybe Msg)
+    | Test5Clear (Maybe Msg)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -59,10 +63,22 @@ update msg model =
         Test4 s ->
             { model | test4 = s } ! []
 
+        Test5 (Just s) ->
+            { model | test5 = s :: model.test5 } ! []
+
+        Test5 _ ->
+            model ! []
+
         Test3Clear (Just (Test3 s)) ->
             { model | test3 = model.test3 |> (List.filter ((/=) s)) } ! []
 
+        Test5Clear (Just (Test5 (Just s))) ->
+            { model | test5 = model.test5 |> (List.filter ((/=) s)) } ! []
+
         Test3Clear _ ->
+            model ! []
+
+        Test5Clear _ ->
             model ! []
 
 
@@ -167,7 +183,7 @@ view model =
                         in
                             (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
                     )
-                , processResults = processResult
+                , processResults = processResult Test4
                 , id_ = "test-1"
                 , parents = [ "parent" ]
                 , clearMsg = Just (\_ -> Test4 Nothing)
@@ -179,12 +195,39 @@ view model =
                 , disabled = model.test2 == Just "a"
                 }
             ]
+        , div []
+            [ select2 SelectTwo
+                { defaults = model.test5 |> List.map (\t -> ( Just (Test5 (Just t)), text t.name, t.name ))
+                , url = Just "//api.github.com/search/repositories"
+                , data =
+                    (\( url, params ) ->
+                        let
+                            term =
+                                if params.term == "" then
+                                    "test"
+                                else
+                                    params.term
+                        in
+                            (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
+                    )
+                , processResults = processResult Test5
+                , id_ = "test-1"
+                , parents = [ "parent" ]
+                , clearMsg = Just Test5Clear
+                , showSearch = True
+                , width = "300px"
+                , placeholder = "Select Test"
+                , list = []
+                , multiSelect = True
+                , disabled = model.test2 == Just "a"
+                }
+            ]
         , select2Dropdown model
         ]
 
 
-processResult : ( String, AjaxParams ) -> ( List (GroupSelectTwoOption Msg), AjaxParams )
-processResult ( string, params ) =
+processResult : (Maybe { id : Int, name : String } -> Msg) -> ( String, AjaxParams ) -> ( List (GroupSelectTwoOption Msg), AjaxParams )
+processResult msg ( string, params ) =
     (JD.decodeString
         ((JD.map2 (,)
             (JD.at [ "items" ] (JD.list itemsDecoder))
@@ -192,7 +235,7 @@ processResult ( string, params ) =
          )
             |> JD.map
                 (\( items, total_count ) ->
-                    ( items |> List.map (\i -> ( Just i, i.name )) |> SelectTwo.basicSelectOptions Test4
+                    ( items |> List.map (\i -> ( Just i, i.name )) |> SelectTwo.basicSelectOptions msg
                     , { params | more = (params.page * 30 < total_count) }
                     )
                 )

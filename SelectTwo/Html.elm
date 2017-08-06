@@ -5,8 +5,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import List.Extra
 import SelectTwo
-import SelectTwoTypes exposing (..)
-import Helpers exposing ((=>), px)
+import SelectTwo.Types exposing (..)
+import SelectTwo.Helpers exposing ((=>), px)
 import Json.Decode as JD
 import Tuple3
 
@@ -123,7 +123,7 @@ multiSelectSpan sender id_ defaults list clearMsg disabled placeholder url =
             ]
 
 
-select2Dropdown : { b | selectTwo : Maybe (SelectTwo msg) } -> Html msg
+select2Dropdown : Model b msg -> Html msg
 select2Dropdown model =
     case model.selectTwo of
         Just { dropdown, hovered, search, list, ajaxStuff } ->

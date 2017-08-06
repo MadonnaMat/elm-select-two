@@ -1,4 +1,4 @@
-module Helpers exposing (..)
+module SelectTwo.Helpers exposing (..)
 
 import Json.Decode as JD
 
@@ -46,3 +46,8 @@ closest class decoder =
                 ]
     in
         JD.lazy body
+
+
+asTuple : (a -> b) -> (a -> c) -> a -> ( b, c )
+asTuple f1 f2 a =
+    ( f1 a, f2 a )

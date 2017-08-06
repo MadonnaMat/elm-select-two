@@ -1,6 +1,6 @@
 module SelectTwo exposing (update, new, map, setFilter, filterList, filterGroup, location, ajaxLocation, basicSelectOptions, basicGroupSelectOptions, preventScrolling, widthGuess)
 
-import SelectTwoTypes exposing (SelectTwoMsg(..), SelectTwo, SelectTwoDropdown, SelectTwoOption, AjaxParams, SelectTwoAjaxStuff, GroupSelectTwoOption)
+import SelectTwo.Types exposing (SelectTwoMsg(..), SelectTwo, SelectTwoDropdown, SelectTwoOption, AjaxParams, SelectTwoAjaxStuff, GroupSelectTwoOption, Model)
 import Json.Decode as JD
 import List.Extra
 import Task
@@ -11,10 +11,10 @@ import Http
 import Process
 import Time
 import Html exposing (text)
-import Helpers exposing (closest, px)
+import SelectTwo.Helpers exposing (closest, px, asTuple)
 
 
-update : SelectTwoMsg msg -> { b | selectTwo : Maybe (SelectTwo msg) } -> ( { b | selectTwo : Maybe (SelectTwo msg) }, Cmd msg )
+update : SelectTwoMsg msg -> Model b msg -> ( Model b msg, Cmd msg )
 update msg model =
     case msg of
         SelectTwoTrigger p dd ->
@@ -32,49 +32,41 @@ update msg model =
 
         SetSelectTwoSearch filter ->
             setFilter filter model
-                ! [ case (model.selectTwo |> Maybe.map .dropdown) of
-                        Just dd ->
-                            delayedSend (dd.delay) ((dd.sender) (DelayedSelectTwoAjax filter))
-
-                        _ ->
-                            Cmd.none
+                ! [ model.selectTwo
+                        |> Maybe.map .dropdown
+                        |> Maybe.andThen (\dd -> delayedSend (dd.delay) ((dd.sender) (DelayedSelectTwoAjax filter)) |> Just)
+                        |> Maybe.withDefault Cmd.none
                   ]
 
         DelayedSelectTwoAjax filter ->
-            let
-                cmd =
-                    case (model.selectTwo |> Maybe.map .search) of
-                        Just (Just search) ->
-                            if search == filter then
-                                ajaxCmd (\p -> { p | page = 1, term = filter, more = False, loading = True }) (map (\s -> { s | list = Just [] }) model)
-                            else
-                                Cmd.none
-
-                        _ ->
-                            Cmd.none
-            in
-                model ! [ cmd ]
+            model
+                ! [ model.selectTwo
+                        |> Maybe.map .search
+                        |> Maybe.andThen identity
+                        |> Maybe.andThen
+                            (\search ->
+                                if search == filter then
+                                    ajaxCmd (\p -> { p | page = 1, term = filter, more = False, loading = True }) (map (\s -> { s | list = Just [] }) model) |> Just
+                                else
+                                    Nothing
+                            )
+                        |> Maybe.withDefault Cmd.none
+                  ]
 
         SelectTwoAjax ( url, data, processResults, params ) (Ok str) ->
             let
-                sendParams =
-                    { params | loading = False }
-
-                prevList =
-                    model.selectTwo |> Maybe.andThen .list |> Maybe.withDefault []
-
                 ( list, newParams ) =
-                    processResults ( str, sendParams )
+                    processResults ( str, { params | loading = False } )
 
                 newList =
-                    (prevList ++ list)
+                    ((model.selectTwo |> Maybe.andThen .list |> Maybe.withDefault []) ++ list)
                         |> List.Extra.groupWhile (\x y -> Tuple.first x == Tuple.first y)
-                        |> List.map
-                            (\l ->
-                                ( l |> List.head |> Maybe.map Tuple.first |> Maybe.withDefault ""
-                                , l |> List.map (Tuple.second) |> List.concat
+                        |> (List.map
+                                (asTuple
+                                    (List.head >> Maybe.map (Tuple.first) >> Maybe.withDefault "")
+                                    (List.map (Tuple.second) >> List.concat)
                                 )
-                            )
+                           )
             in
                 map (\s -> { s | list = Just newList, ajaxStuff = Just ( url, data, processResults, newParams ) }) model ! []
 
@@ -94,25 +86,29 @@ update msg model =
             model ! []
 
 
-checkScrollPage : Int -> Int -> { b | selectTwo : Maybe (SelectTwo msg) } -> ( { b | selectTwo : Maybe (SelectTwo msg) }, Cmd msg )
+checkScrollPage : Int -> Int -> Model b msg -> ( Model b msg, Cmd msg )
 checkScrollPage scrollTop scrollHeight model =
     let
         ajaxStuff =
             (model.selectTwo |> Maybe.map .ajaxStuff)
     in
-        case ajaxStuff of
-            Just (Just ( url, data, processResults, params )) ->
-                if incrementPage scrollTop scrollHeight params then
-                    let
-                        newModel =
-                            map (\s -> { s | ajaxStuff = Just ( url, data, processResults, { params | loading = True, page = params.page + 1 } ) }) model
-                    in
-                        newModel ! [ ajaxCmd identity newModel ]
-                else
-                    ( model, Cmd.none )
+        model.selectTwo
+            |> Maybe.map .ajaxStuff
+            |> Maybe.andThen identity
+            |> Maybe.andThen (sendPageIncrement model scrollTop scrollHeight)
+            |> Maybe.withDefault ( model, Cmd.none )
 
-            _ ->
-                ( model, Cmd.none )
+
+sendPageIncrement : Model b msg -> Int -> Int -> SelectTwoAjaxStuff msg -> Maybe ( Model b msg, Cmd msg )
+sendPageIncrement model scrollTop scrollHeight ( url, data, processResults, params ) =
+    if incrementPage scrollTop scrollHeight params then
+        let
+            newModel =
+                map (\s -> { s | ajaxStuff = Just ( url, data, processResults, { params | loading = True, page = params.page + 1 } ) }) model
+        in
+            Just (newModel ! [ ajaxCmd identity newModel ])
+    else
+        Nothing
 
 
 incrementPage : Int -> Int -> AjaxParams -> Bool
@@ -133,7 +129,7 @@ delayedSend milli msg =
         |> Task.perform (\_ -> msg)
 
 
-ajaxCmd : (AjaxParams -> AjaxParams) -> { b | selectTwo : Maybe (SelectTwo msg) } -> Cmd msg
+ajaxCmd : (AjaxParams -> AjaxParams) -> Model b msg -> Cmd msg
 ajaxCmd f model =
     case model.selectTwo of
         Just selectTwo ->
@@ -160,12 +156,12 @@ ajaxCmd f model =
             Cmd.none
 
 
-new : List String -> SelectTwoDropdown a -> { b | selectTwo : Maybe (SelectTwo a) } -> { b | selectTwo : Maybe (SelectTwo a) }
+new : List String -> SelectTwoDropdown msg -> Model b msg -> Model b msg
 new p dd model =
     { model | selectTwo = Just { dropdown = dd, hovered = Nothing, search = Nothing, parents = p, list = Nothing, ajaxStuff = Nothing } }
 
 
-map : (SelectTwo a -> SelectTwo a) -> { b | selectTwo : Maybe (SelectTwo a) } -> { b | selectTwo : Maybe (SelectTwo a) }
+map : (SelectTwo msg -> SelectTwo msg) -> Model b msg -> Model b msg
 map f model =
     let
         newSelectTwo =
@@ -174,7 +170,7 @@ map f model =
         { model | selectTwo = newSelectTwo }
 
 
-setFilter : String -> { b | selectTwo : Maybe (SelectTwo a) } -> { b | selectTwo : Maybe (SelectTwo a) }
+setFilter : String -> Model b msg -> Model b msg
 setFilter filter =
     let
         search =
@@ -193,12 +189,9 @@ filterGroup filter list =
 
 filterList : Maybe String -> SelectTwoOption a -> Bool
 filterList filter ( _, _, text ) =
-    case filter of
-        Just f ->
-            String.contains (f |> String.toLower) (text |> String.toLower)
-
-        Nothing ->
-            True
+    filter
+        |> Maybe.andThen ((String.toLower) >> (flip String.contains (text |> String.toLower)) >> Just)
+        |> Maybe.withDefault True
 
 
 send : msg -> Cmd msg
@@ -243,7 +236,15 @@ location id_ delay sender defaults list parents showSearch =
             )
         )
         (JD.at [ "offsetWidth" ] JD.float)
-        |> JD.map (buildDropdown id_ delay sender defaults list showSearch Nothing)
+        |> JD.map
+            (buildDropdown id_
+                delay
+                sender
+                defaults
+                list
+                showSearch
+                Nothing
+            )
         |> JD.map ((SelectTwoTrigger parents) >> sender)
         |> (JD.field "target" << closest "select2")
 
@@ -275,14 +276,32 @@ ajaxLocation id_ delay sender defaults parents showSearch url data processResult
             )
         )
         (JD.at [ "offsetWidth" ] JD.float)
-        |> JD.map (buildDropdown id_ delay sender defaults [] showSearch (Just ( url, data, processResults, { page = 1, term = "", more = False, loading = True } )))
+        |> JD.map
+            (buildDropdown id_
+                delay
+                sender
+                defaults
+                []
+                showSearch
+                (Just ( url, data, processResults, { page = 1, term = "", more = False, loading = True } ))
+            )
         |> JD.map ((SelectTwoTrigger parents) >> sender)
         |> (JD.field "target" << closest "select2")
 
 
 buildDropdown : String -> Float -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Bool -> Maybe (SelectTwoAjaxStuff msg) -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
 buildDropdown id_ delay sender defaults list showSearch ajaxStuff ( ( x, y ), width ) =
-    { id_ = id_, sender = sender, defaults = defaults, list = list, showSearch = showSearch, x = x, y = y, width = width, ajaxStuff = ajaxStuff, delay = delay }
+    { id_ = id_
+    , sender = sender
+    , defaults = defaults
+    , list = list
+    , showSearch = showSearch
+    , x = x
+    , y = y
+    , width = width
+    , ajaxStuff = ajaxStuff
+    , delay = delay
+    }
 
 
 basicSelectOptions : (a -> msg) -> List ( a, String ) -> List (GroupSelectTwoOption msg)
@@ -299,11 +318,12 @@ basicGroupSelectOptions msg list =
 
 selectGroup : (a -> msg) -> List ( a, String, String ) -> GroupSelectTwoOption msg
 selectGroup msg list =
-    let
-        group =
-            list |> List.head |> Maybe.map Tuple3.third |> Maybe.withDefault ""
-    in
-        ( group, List.map (\( a, b, _ ) -> selectOption msg ( a, b )) list )
+    ( list
+        |> List.head
+        |> Maybe.map Tuple3.third
+        |> Maybe.withDefault ""
+    , List.map (Tuple3.init >> (selectOption msg)) list
+    )
 
 
 selectOption : (a -> msg) -> ( a, String ) -> SelectTwoOption msg
@@ -311,11 +331,11 @@ selectOption msg ( val, txt ) =
     ( Just (msg val), text txt, txt )
 
 
-preventScrolling : String -> Maybe (SelectTwo msg) -> List ( String, String )
-preventScrolling name selectTwo =
+preventScrolling : String -> Model b msg -> List ( String, String )
+preventScrolling name model =
     let
         prevent =
-            selectTwo
+            model.selectTwo
                 |> Maybe.map .parents
                 |> Maybe.withDefault []
                 |> List.member name

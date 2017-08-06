@@ -1,4 +1,4 @@
-module SelectTwoTypes exposing (..)
+module SelectTwo.Types exposing (..)
 
 import Dom
 import Http
@@ -16,6 +16,10 @@ type SelectTwoMsg a
     | STMsg a
     | STNull
     | ResultScroll ScrollInfo
+
+
+type alias Model b a =
+    { b | selectTwo : Maybe (SelectTwo a) }
 
 
 type alias SelectTwoConfig a =

@@ -5,11 +5,11 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import SelectTwo exposing (..)
 import SelectTwo.Html exposing (..)
-import SelectTwoTypes exposing (..)
+import SelectTwo.Types exposing (..)
 import Task
 import Tuple3
 import Json.Decode as JD
-import Helpers exposing ((=>))
+import SelectTwo.Helpers exposing ((=>))
 
 
 type alias Model =

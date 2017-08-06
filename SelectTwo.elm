@@ -8,6 +8,8 @@ import Tuple
 import Tuple3
 import Dom
 import Http
+import Process
+import Time
 import Html exposing (text)
 import Helpers exposing (closest, px)
 
@@ -20,7 +22,7 @@ update msg model =
                 newModel =
                     new p dd model
             in
-                newModel ! [ Dom.focus ((dd |> dropdownId) ++ "--search") |> Task.attempt (STRes >> (dd |> dropdownSender)), ajaxCmd identity (map (\s -> { s | list = Just [] }) newModel) ]
+                newModel ! [ Dom.focus ((dd.id_) ++ "--search") |> Task.attempt (STRes >> (dd.sender)), ajaxCmd identity (map (\s -> { s | list = Just [] }) newModel) ]
 
         SelectTwoHovered hovered ->
             map (\s -> { s | hovered = hovered }) model ! []
@@ -29,7 +31,29 @@ update msg model =
             { model | selectTwo = Nothing } ! [ msg |> Maybe.map send |> Maybe.withDefault Cmd.none ]
 
         SetSelectTwoSearch filter ->
-            setFilter filter model ! [ ajaxCmd (\p -> { p | page = 1, term = filter, more = False, loading = True }) (map (\s -> { s | list = Just [] }) model) ]
+            setFilter filter model
+                ! [ case (model.selectTwo |> Maybe.map .dropdown) of
+                        Just dd ->
+                            delayedSend (dd.delay) ((dd.sender) (DelayedSelectTwoAjax filter))
+
+                        _ ->
+                            Cmd.none
+                  ]
+
+        DelayedSelectTwoAjax filter ->
+            let
+                cmd =
+                    case (model.selectTwo |> Maybe.map .search) of
+                        Just (Just search) ->
+                            if search == filter then
+                                ajaxCmd (\p -> { p | page = 1, term = filter, more = False, loading = True }) (map (\s -> { s | list = Just [] }) model)
+                            else
+                                Cmd.none
+
+                        _ ->
+                            Cmd.none
+            in
+                model ! [ cmd ]
 
         SelectTwoAjax ( url, data, processResults, params ) (Ok str) ->
             let
@@ -103,6 +127,12 @@ incrementPage scrollTop scrollHeight params =
         scrollPageTop / scrollPageHeight > 0.7 && (not params.loading) && params.more
 
 
+delayedSend : Float -> msg -> Cmd msg
+delayedSend milli msg =
+    Process.sleep (Time.millisecond * milli)
+        |> Task.perform (\_ -> msg)
+
+
 ajaxCmd : (AjaxParams -> AjaxParams) -> { b | selectTwo : Maybe (SelectTwo msg) } -> Cmd msg
 ajaxCmd f model =
     case model.selectTwo of
@@ -110,12 +140,12 @@ ajaxCmd f model =
             let
                 ajaxStuff =
                     if selectTwo.ajaxStuff == Nothing then
-                        selectTwo.dropdown |> dropdownAjaxStuff
+                        selectTwo.dropdown.ajaxStuff
                     else
                         selectTwo.ajaxStuff
 
                 sender =
-                    selectTwo.dropdown |> dropdownSender
+                    selectTwo.dropdown.sender
             in
                 case ajaxStuff of
                     Just ( url, data, processResults, params ) ->
@@ -154,21 +184,6 @@ setFilter filter =
                 Just filter
     in
         map (\s -> { s | search = search })
-
-
-dropdownId : SelectTwoDropdown a -> String
-dropdownId ( id_, _, _, _, _, _, _, _, _ ) =
-    id_
-
-
-dropdownSender : SelectTwoDropdown a -> SelectTwoMsg a -> a
-dropdownSender ( _, sender, _, _, _, _, _, _, _ ) =
-    sender
-
-
-dropdownAjaxStuff : SelectTwoDropdown a -> Maybe (SelectTwoAjaxStuff a)
-dropdownAjaxStuff ( _, _, _, _, _, _, _, _, ajaxStuff ) =
-    ajaxStuff
 
 
 filterGroup : Maybe String -> GroupSelectTwoOption a -> GroupSelectTwoOption a
@@ -211,8 +226,8 @@ parentSize dir oldParents =
                 JD.field "scrollTop" JD.float
 
 
-location : String -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> List String -> Bool -> JD.Decoder msg
-location id_ sender defaults list parents showSearch =
+location : String -> Float -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> List String -> Bool -> JD.Decoder msg
+location id_ delay sender defaults list parents showSearch =
     JD.map2 (,)
         (JD.map2 (,)
             (JD.map2 (+)
@@ -228,13 +243,14 @@ location id_ sender defaults list parents showSearch =
             )
         )
         (JD.at [ "offsetWidth" ] JD.float)
-        |> JD.map (buildDropdown id_ sender defaults list showSearch Nothing)
+        |> JD.map (buildDropdown id_ delay sender defaults list showSearch Nothing)
         |> JD.map ((SelectTwoTrigger parents) >> sender)
         |> (JD.field "target" << closest "select2")
 
 
 ajaxLocation :
     String
+    -> Float
     -> (SelectTwoMsg msg -> msg)
     -> List (SelectTwoOption msg)
     -> List String
@@ -243,7 +259,7 @@ ajaxLocation :
     -> (( String, AjaxParams ) -> String)
     -> (( String, AjaxParams ) -> ( List (GroupSelectTwoOption msg), AjaxParams ))
     -> JD.Decoder msg
-ajaxLocation id_ sender defaults parents showSearch url data processResults =
+ajaxLocation id_ delay sender defaults parents showSearch url data processResults =
     JD.map2 (,)
         (JD.map2 (,)
             (JD.map2 (+)
@@ -259,14 +275,14 @@ ajaxLocation id_ sender defaults parents showSearch url data processResults =
             )
         )
         (JD.at [ "offsetWidth" ] JD.float)
-        |> JD.map (buildDropdown id_ sender defaults [] showSearch (Just ( url, data, processResults, { page = 1, term = "", more = False, loading = True } )))
+        |> JD.map (buildDropdown id_ delay sender defaults [] showSearch (Just ( url, data, processResults, { page = 1, term = "", more = False, loading = True } )))
         |> JD.map ((SelectTwoTrigger parents) >> sender)
         |> (JD.field "target" << closest "select2")
 
 
-buildDropdown : String -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Bool -> Maybe (SelectTwoAjaxStuff msg) -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
-buildDropdown id_ sender defaults list showSearch ajaxStuff ( ( x, y ), width ) =
-    ( id_, sender, defaults, list, showSearch, x, y, width, ajaxStuff )
+buildDropdown : String -> Float -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Bool -> Maybe (SelectTwoAjaxStuff msg) -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
+buildDropdown id_ delay sender defaults list showSearch ajaxStuff ( ( x, y ), width ) =
+    { id_ = id_, sender = sender, defaults = defaults, list = list, showSearch = showSearch, x = x, y = y, width = width, ajaxStuff = ajaxStuff, delay = delay }
 
 
 basicSelectOptions : (a -> msg) -> List ( a, String ) -> List (GroupSelectTwoOption msg)

@@ -10,6 +10,7 @@ type SelectTwoMsg a
     | SelectTwoHovered (Maybe a)
     | SelectTwoSelected (Maybe a)
     | SetSelectTwoSearch String
+    | DelayedSelectTwoAjax String
     | SelectTwoAjax (SelectTwoAjaxStuff a) (Result Http.Error String)
     | STRes (Result Dom.Error ())
     | STMsg a
@@ -31,20 +32,7 @@ type alias SelectTwoConfig a =
     , placeholder : String
     , disabled : Bool
     , multiSelect : Bool
-    }
-
-
-type alias SelectTwoAjaxConfig a =
-    { default : SelectTwoOption a
-    , id_ : String
-    , parents : List String
-    , data : ( String, AjaxParams ) -> String
-    , processResults : ( String, AjaxParams ) -> ( List (GroupSelectTwoOption a), AjaxParams )
-    , clearMsg : Maybe a
-    , showSearch : Bool
-    , width : String
-    , placeholder : String
-    , disabled : Bool
+    , delay : Float
     }
 
 
@@ -75,7 +63,17 @@ type alias SelectTwo a =
 
 
 type alias SelectTwoDropdown a =
-    ( String, SelectTwoMsg a -> a, List (SelectTwoOption a), List (GroupSelectTwoOption a), Bool, Float, Float, Float, Maybe (SelectTwoAjaxStuff a) )
+    { id_ : String
+    , sender : SelectTwoMsg a -> a
+    , defaults : List (SelectTwoOption a)
+    , list : List (GroupSelectTwoOption a)
+    , showSearch : Bool
+    , x : Float
+    , y : Float
+    , width : Float
+    , ajaxStuff : Maybe (SelectTwoAjaxStuff a)
+    , delay : Float
+    }
 
 
 type alias SelectTwoAjaxStuff a =

@@ -22,7 +22,7 @@ select2Close sender =
 
 
 select2 : (SelectTwoMsg msg -> msg) -> SelectTwoConfig msg -> Html msg
-select2 sender { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, url, processResults, data } =
+select2 sender { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, url, processResults, data, delay } =
     span
         [ classList
             [ "select2 select2-container select2-container--default select2-container--below select2-container--focus" => True
@@ -33,10 +33,10 @@ select2 sender { defaults, list, parents, clearMsg, showSearch, width, placehold
         , if not disabled then
             case url of
                 Just u ->
-                    Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.ajaxLocation id_ sender defaults parents showSearch u data processResults)
+                    Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.ajaxLocation id_ delay sender defaults parents (showSearch && not multiSelect) u data processResults)
 
                 Nothing ->
-                    Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.location id_ sender defaults list parents (showSearch && not multiSelect))
+                    Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.location id_ delay sender defaults list parents (showSearch && not multiSelect))
           else
             attribute "data-blank" ""
         ]
@@ -134,7 +134,7 @@ select2Dropdown model =
 
 
 select2DropdownDraw : SelectTwoDropdown msg -> Maybe msg -> Maybe String -> Maybe (List (GroupSelectTwoOption msg)) -> Maybe (SelectTwoAjaxStuff msg) -> Html msg
-select2DropdownDraw ( id_, sender, defaults, list, showSearch, x, y, width, _ ) hovered search ajaxList ajaxStuff =
+select2DropdownDraw { id_, sender, defaults, list, showSearch, x, y, width } hovered search ajaxList ajaxStuff =
     let
         theList =
             case ajaxList of

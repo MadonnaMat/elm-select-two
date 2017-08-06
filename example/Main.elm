@@ -126,6 +126,7 @@ view model =
                 , url = Nothing
                 , data = (\_ -> "")
                 , processResults = (\( _, params ) -> ( [], params ))
+                , delay = 0
                 }
             ]
         , div []
@@ -134,7 +135,7 @@ view model =
                     (testList2 Test2)
                         |> List.concatMap (\( _, l ) -> l)
                         |> List.filter (\l -> (Just (Test2 model.test2)) == (l |> Tuple3.first))
-                , id_ = "test-1"
+                , id_ = "test-2"
                 , list = testList2 Test2
                 , parents = [ "parent" ]
                 , clearMsg = Just (\_ -> Test2 Nothing)
@@ -146,6 +147,7 @@ view model =
                 , url = Nothing
                 , data = (\_ -> "")
                 , processResults = (\( _, params ) -> ( [], params ))
+                , delay = 0
                 }
             ]
         , div []
@@ -166,6 +168,7 @@ view model =
                 , url = Nothing
                 , data = (\_ -> "")
                 , processResults = (\( _, params ) -> ( [], params ))
+                , delay = 0
                 }
             ]
         , div []
@@ -184,7 +187,7 @@ view model =
                             (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
                     )
                 , processResults = processResult Test4
-                , id_ = "test-1"
+                , id_ = "test-4"
                 , parents = [ "parent" ]
                 , clearMsg = Just (\_ -> Test4 Nothing)
                 , showSearch = True
@@ -193,6 +196,7 @@ view model =
                 , list = []
                 , multiSelect = False
                 , disabled = model.test2 == Just "a"
+                , delay = 300
                 }
             ]
         , div []
@@ -211,7 +215,7 @@ view model =
                             (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
                     )
                 , processResults = processResult Test5
-                , id_ = "test-1"
+                , id_ = "test-5"
                 , parents = [ "parent" ]
                 , clearMsg = Just Test5Clear
                 , showSearch = True
@@ -220,6 +224,7 @@ view model =
                 , list = []
                 , multiSelect = True
                 , disabled = model.test2 == Just "a"
+                , delay = 300
                 }
             ]
         , select2Dropdown model

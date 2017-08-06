@@ -1,5 +1,8 @@
 module SelectTwo.Html exposing (select2, select2Dropdown, select2Css, select2Close)
 
+{-| Library for dropdown views
+-}
+
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -44,13 +47,13 @@ select2 sender { defaults, list, parents, clearMsg, showSearch, width, placehold
             [ if multiSelect then
                 multiSelectSpan sender id_ defaults list clearMsg disabled placeholder url
               else
-                singleSelectSpan sender (defaults |> List.head) clearMsg placeholder
+                singleSelectSpan (defaults |> List.head) clearMsg placeholder
             ]
         ]
 
 
-singleSelectSpan : (SelectTwoMsg msg -> msg) -> Maybe (SelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> String -> Html msg
-singleSelectSpan sender default clearMsg placeholder =
+singleSelectSpan : Maybe (SelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> String -> Html msg
+singleSelectSpan default clearMsg placeholder =
     let
         ( defaultMsg, defaultText, _ ) =
             default |> Maybe.withDefault ( Nothing, text "", "" )
@@ -62,7 +65,7 @@ singleSelectSpan sender default clearMsg placeholder =
                   else
                     case clearMsg of
                         Just msg ->
-                            span [ class "select2-selection__clear", onClick (sender (STMsg (msg defaultMsg))) ] [ text "×" ]
+                            span [ class "select2-selection__clear", onClick (msg defaultMsg) ] [ text "×" ]
 
                         Nothing ->
                             text ""
@@ -93,7 +96,7 @@ multiSelectSpan sender id_ defaults list clearMsg disabled placeholder url =
                             li [ class "select2-selection__choice" ]
                                 [ case clearMsg of
                                     Just clrMsg ->
-                                        span [ class "select2-selection__choice__remove", onClick (sender (STMsg (clrMsg msg))) ] [ text "×" ]
+                                        span [ class "select2-selection__choice__remove", onClick (clrMsg msg) ] [ text "×" ]
 
                                     Nothing ->
                                         text ""

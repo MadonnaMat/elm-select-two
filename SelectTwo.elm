@@ -1,5 +1,14 @@
 module SelectTwo exposing (update, new, map, setFilter, filterList, filterGroup, location, ajaxLocation, basicSelectOptions, basicGroupSelectOptions, preventScrolling, widthGuess)
 
+{-| SelectTwo Methods
+
+
+# Methods
+
+@docs update, new, map, setFilter, filterList, filterGroup, location, ajaxLocation, basicSelectOptions, basicGroupSelectOptions, preventScrolling, widthGuess
+
+-}
+
 import SelectTwo.Types exposing (SelectTwoMsg(..), SelectTwo, SelectTwoDropdown, SelectTwoOption, AjaxParams, SelectTwoAjaxStuff, GroupSelectTwoOption, Model)
 import Json.Decode as JD
 import List.Extra

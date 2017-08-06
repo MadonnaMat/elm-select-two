@@ -211,7 +211,7 @@ parentSize dir oldParents =
                 JD.field "scrollTop" JD.float
 
 
-location : String -> (SelectTwoMsg msg -> msg) -> List msg -> List (GroupSelectTwoOption msg) -> List String -> Bool -> JD.Decoder msg
+location : String -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> List String -> Bool -> JD.Decoder msg
 location id_ sender defaults list parents showSearch =
     JD.map2 (,)
         (JD.map2 (,)
@@ -236,7 +236,7 @@ location id_ sender defaults list parents showSearch =
 ajaxLocation :
     String
     -> (SelectTwoMsg msg -> msg)
-    -> List msg
+    -> List (SelectTwoOption msg)
     -> List String
     -> Bool
     -> String
@@ -264,7 +264,7 @@ ajaxLocation id_ sender defaults parents showSearch url data processResults =
         |> (JD.field "target" << closest "select2")
 
 
-buildDropdown : String -> (SelectTwoMsg msg -> msg) -> List msg -> List (GroupSelectTwoOption msg) -> Bool -> Maybe (SelectTwoAjaxStuff msg) -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
+buildDropdown : String -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Bool -> Maybe (SelectTwoAjaxStuff msg) -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
 buildDropdown id_ sender defaults list showSearch ajaxStuff ( ( x, y ), width ) =
     ( id_, sender, defaults, list, showSearch, x, y, width, ajaxStuff )
 

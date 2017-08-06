@@ -1,4 +1,4 @@
-module SelectTwo.Html exposing (select2, select2Multiple, select2Ajax, select2Dropdown, select2Css, select2Close)
+module SelectTwo.Html exposing (select2, select2Dropdown, select2Css, select2Close)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -22,135 +22,95 @@ select2Close sender =
 
 
 select2 : (SelectTwoMsg msg -> msg) -> SelectTwoConfig msg -> Html msg
-select2 sender { default, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled } =
-    let
-        ( _, defaultText, _ ) =
-            list |> List.concatMap (\( _, l ) -> l) |> List.Extra.find (\( msg, _, _ ) -> msg == Just default) |> Maybe.withDefault ( Nothing, text "", "" )
-    in
-        span
-            [ classList
-                [ "select2 select2-container select2-container--default select2-container--below select2-container--focus" => True
-                , "select2-container--disabled" => disabled
-                ]
-            , id id_
-            , style [ "width" => width ]
-            , if not disabled then
-                Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.location id_ sender [ default ] list parents showSearch)
-              else
-                attribute "data-blank" ""
-            ]
-            [ span [ class "selection" ]
-                [ span [ class "select2-selection select2-selection--single" ]
-                    [ span [ class "select2-selection__rendered" ]
-                        [ if defaultText == text "" then
-                            span [ class "select2-selection__placeholder" ] [ text placeholder ]
-                          else
-                            case clearMsg of
-                                Just msg ->
-                                    span [ class "select2-selection__clear", onClick (sender (STMsg msg)) ] [ text "×" ]
-
-                                Nothing ->
-                                    text ""
-                        , defaultText
-                        ]
-                    , span [ class "select2-selection__arrow" ] [ b [] [] ]
-                    ]
-                ]
-            ]
-
-
-select2Ajax : (SelectTwoMsg msg -> msg) -> SelectTwoAjaxConfig msg -> Html msg
-select2Ajax sender { default, url, data, processResults, parents, clearMsg, showSearch, width, placeholder, id_, disabled } =
-    let
-        ( defaultMsg, defaultText, _ ) =
-            default
-    in
-        span
-            [ classList
-                [ "select2 select2-container select2-container--default select2-container--below select2-container--focus" => True
-                , "select2-container--disabled" => disabled
-                ]
-            , id id_
-            , style [ "width" => width ]
-            , if not disabled then
-                Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.ajaxLocation id_ sender [ defaultMsg |> Maybe.withDefault (sender STNull) ] parents showSearch url data processResults)
-              else
-                attribute "data-blank" ""
-            ]
-            [ span [ class "selection" ]
-                [ span [ class "select2-selection select2-selection--single" ]
-                    [ span [ class "select2-selection__rendered" ]
-                        [ if defaultText == text "" then
-                            span [ class "select2-selection__placeholder" ] [ text placeholder ]
-                          else
-                            case clearMsg of
-                                Just msg ->
-                                    span [ class "select2-selection__clear", onClick (sender (STMsg msg)) ] [ text "×" ]
-
-                                Nothing ->
-                                    text ""
-                        , defaultText
-                        ]
-                    , span [ class "select2-selection__arrow" ] [ b [] [] ]
-                    ]
-                ]
-            ]
-
-
-select2Multiple : (SelectTwoMsg msg -> msg) -> SelectTwoMultipleConfig msg -> Html msg
-select2Multiple sender { defaults, list, parents, clearMsg, width, placeholder, id_, disabled } =
+select2 sender { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, url, processResults, data } =
     span
         [ classList
             [ "select2 select2-container select2-container--default select2-container--below select2-container--focus" => True
             , "select2-container--disabled" => disabled
             ]
-        , style [ "width" => width ]
         , id id_
+        , style [ "width" => width ]
         , if not disabled then
-            Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.location id_ sender defaults list parents False)
+            case url of
+                Just u ->
+                    Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.ajaxLocation id_ sender defaults parents showSearch u data processResults)
+
+                Nothing ->
+                    Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.location id_ sender defaults list parents (showSearch && not multiSelect))
           else
             attribute "data-blank" ""
         ]
         [ span [ class "selection" ]
-            [ span [ class "select2-selection select2-selection--multiple" ]
-                [ ul [ class "select2-selection__rendered" ]
-                    ((list
-                        |> List.concatMap Tuple.second
-                        |> List.filter (\l -> defaults |> List.map Just |> List.member (Tuple3.first l))
-                        |> List.map
-                            (\( msg, txt, _ ) ->
-                                case msg of
-                                    Just ms ->
-                                        li [ class "select2-selection__choice" ]
-                                            [ span [ class "select2-selection__choice__remove", onClick (sender (STMsg (clearMsg ms))) ] [ text "×" ]
-                                            , txt
-                                            ]
-
-                                    Nothing ->
-                                        text ""
-                            )
-                     )
-                        ++ [ li [ class "select2-search select2-search--inline" ]
-                                [ if not disabled then
-                                    input
-                                        [ class "select2-search__field"
-                                        , onInput (SetSelectTwoSearch >> sender)
-                                        , id (id_ ++ "--search")
-                                        , Html.Attributes.placeholder
-                                            (if (defaults |> List.length) > 0 then
-                                                ""
-                                             else
-                                                placeholder
-                                            )
-                                        ]
-                                        []
-                                  else
-                                    text ""
-                                ]
-                           ]
-                    )
-                ]
+            [ if multiSelect then
+                multiSelectSpan sender id_ defaults list clearMsg disabled placeholder
+              else
+                singleSelectSpan sender (defaults |> List.head) clearMsg placeholder
             ]
+        ]
+
+
+singleSelectSpan : (SelectTwoMsg msg -> msg) -> Maybe (SelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> String -> Html msg
+singleSelectSpan sender default clearMsg placeholder =
+    let
+        ( defaultMsg, defaultText, _ ) =
+            default |> Maybe.withDefault ( Nothing, text "", "" )
+    in
+        span [ class "select2-selection select2-selection--single" ]
+            [ span [ class "select2-selection__rendered" ]
+                [ if defaultText == text "" then
+                    span [ class "select2-selection__placeholder" ] [ text placeholder ]
+                  else
+                    case clearMsg of
+                        Just msg ->
+                            span [ class "select2-selection__clear", onClick (sender (STMsg (msg defaultMsg))) ] [ text "×" ]
+
+                        Nothing ->
+                            text ""
+                , defaultText
+                ]
+            , span [ class "select2-selection__arrow" ] [ b [] [] ]
+            ]
+
+
+multiSelectSpan : (SelectTwoMsg msg -> msg) -> String -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> Bool -> String -> Html msg
+multiSelectSpan sender id_ defaults list clearMsg disabled placeholder =
+    span [ class "select2-selection select2-selection--multiple" ]
+        [ ul [ class "select2-selection__rendered" ]
+            ((list
+                |> List.concatMap Tuple.second
+                |> List.filter (flip List.member defaults)
+                |> List.map
+                    (\( msg, txt, _ ) ->
+                        li [ class "select2-selection__choice" ]
+                            [ case clearMsg of
+                                Just clrMsg ->
+                                    span [ class "select2-selection__choice__remove", onClick (sender (STMsg (clrMsg msg))) ] [ text "×" ]
+
+                                Nothing ->
+                                    text ""
+                            , txt
+                            ]
+                    )
+             )
+                ++ [ li [ class "select2-search select2-search--inline" ]
+                        [ if not disabled then
+                            input
+                                [ class "select2-search__field"
+                                , onInput (SetSelectTwoSearch >> sender)
+                                , id (id_ ++ "--search")
+                                , Html.Attributes.placeholder
+                                    (if (defaults |> List.length) > 0 then
+                                        ""
+                                     else
+                                        placeholder
+                                    )
+                                ]
+                                []
+                          else
+                            text ""
+                        ]
+                   ]
+            )
         ]
 
 
@@ -213,7 +173,7 @@ scrollPosition wrapper =
         |> JD.map wrapper
 
 
-listOrGroup : (SelectTwoMsg msg -> msg) -> List msg -> List (GroupSelectTwoOption msg) -> Maybe msg -> Maybe String -> List (Html msg)
+listOrGroup : (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Maybe msg -> Maybe String -> List (Html msg)
 listOrGroup sender defaults list hovered search =
     if List.length list == 1 && (list |> List.head |> Maybe.map (Tuple.first) |> Maybe.withDefault "") == "" then
         list
@@ -228,7 +188,7 @@ listOrGroup sender defaults list hovered search =
             |> List.map (select2ListGroup sender defaults hovered)
 
 
-select2ListGroup : (SelectTwoMsg msg -> msg) -> List msg -> Maybe msg -> GroupSelectTwoOption msg -> Html msg
+select2ListGroup : (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> Maybe msg -> GroupSelectTwoOption msg -> Html msg
 select2ListGroup sender defaults hovered ( label, list ) =
     li [ class "select2-results__option" ]
         [ strong [ class "select2-results__group" ] [ text label ]
@@ -239,18 +199,22 @@ select2ListGroup sender defaults hovered ( label, list ) =
         ]
 
 
-select2ListItem : (SelectTwoMsg msg -> msg) -> List msg -> Maybe msg -> SelectTwoOption msg -> Html msg
-select2ListItem sender defaults hovered ( msg, display, _ ) =
-    li
-        [ classList
-            [ "select2-results__option" => True
-            , "select2-results__option--highlighted" => msg == hovered
+select2ListItem : (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> Maybe msg -> SelectTwoOption msg -> Html msg
+select2ListItem sender defaults hovered option =
+    let
+        ( msg, display, _ ) =
+            option
+    in
+        li
+            [ classList
+                [ "select2-results__option" => True
+                , "select2-results__option--highlighted" => msg == hovered
+                ]
+            , attribute "aria-selected" (toString (defaults |> List.member option) |> String.toLower)
+            , Html.Events.onMouseOver (sender (SelectTwoHovered msg))
+            , onClick (sender (SelectTwoSelected msg))
             ]
-        , attribute "aria-selected" (toString (defaults |> List.map Just |> List.member msg) |> String.toLower)
-        , Html.Events.onMouseOver (sender (SelectTwoHovered msg))
-        , onClick (sender (SelectTwoSelected msg))
-        ]
-        [ display ]
+            [ display ]
 
 
 preventAndStop : { preventDefault : Bool, stopPropagation : Bool }

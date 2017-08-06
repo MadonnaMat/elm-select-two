@@ -18,15 +18,19 @@ type SelectTwoMsg a
 
 
 type alias SelectTwoConfig a =
-    { default : a
+    { defaults : List (SelectTwoOption a)
     , id_ : String
     , list : List (GroupSelectTwoOption a)
     , parents : List String
-    , clearMsg : Maybe a
+    , url : Maybe String
+    , data : ( String, AjaxParams ) -> String
+    , processResults : ( String, AjaxParams ) -> ( List (GroupSelectTwoOption a), AjaxParams )
+    , clearMsg : Maybe (Maybe a -> a)
     , showSearch : Bool
     , width : String
     , placeholder : String
     , disabled : Bool
+    , multiSelect : Bool
     }
 
 
@@ -34,23 +38,10 @@ type alias SelectTwoAjaxConfig a =
     { default : SelectTwoOption a
     , id_ : String
     , parents : List String
-    , url : String
     , data : ( String, AjaxParams ) -> String
     , processResults : ( String, AjaxParams ) -> ( List (GroupSelectTwoOption a), AjaxParams )
     , clearMsg : Maybe a
     , showSearch : Bool
-    , width : String
-    , placeholder : String
-    , disabled : Bool
-    }
-
-
-type alias SelectTwoMultipleConfig a =
-    { defaults : List a
-    , id_ : String
-    , list : List (GroupSelectTwoOption a)
-    , parents : List String
-    , clearMsg : a -> a
     , width : String
     , placeholder : String
     , disabled : Bool
@@ -84,7 +75,7 @@ type alias SelectTwo a =
 
 
 type alias SelectTwoDropdown a =
-    ( String, SelectTwoMsg a -> a, List a, List (GroupSelectTwoOption a), Bool, Float, Float, Float, Maybe (SelectTwoAjaxStuff a) )
+    ( String, SelectTwoMsg a -> a, List (SelectTwoOption a), List (GroupSelectTwoOption a), Bool, Float, Float, Float, Maybe (SelectTwoAjaxStuff a) )
 
 
 type alias SelectTwoAjaxStuff a =

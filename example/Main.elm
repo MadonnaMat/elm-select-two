@@ -7,6 +7,7 @@ import SelectTwo exposing (..)
 import SelectTwo.Html exposing (..)
 import SelectTwoTypes exposing (..)
 import Task
+import Tuple3
 import Json.Decode as JD
 import Helpers exposing ((=>))
 
@@ -37,7 +38,7 @@ type Msg
     | Test3 (Maybe String)
     | Test4 (Maybe { id : Int, name : String })
     | SelectTwo (SelectTwoMsg Msg)
-    | Test3Clear Msg
+    | Test3Clear (Maybe Msg)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -58,7 +59,7 @@ update msg model =
         Test4 s ->
             { model | test4 = s } ! []
 
-        Test3Clear (Test3 s) ->
+        Test3Clear (Just (Test3 s)) ->
             { model | test3 = model.test3 |> (List.filter ((/=) s)) } ! []
 
         Test3Clear _ ->
@@ -93,46 +94,68 @@ view model =
         [ select2Css
         , div []
             [ select2 SelectTwo
-                { default = Test model.test
-                , list = testList Test
+                { defaults =
+                    (testList Test)
+                        |> List.concatMap (\( _, l ) -> l)
+                        |> List.filter (\l -> (Just (Test model.test)) == (l |> Tuple3.first))
                 , id_ = "test-1"
+                , list = testList Test
                 , parents = [ "parent" ]
-                , clearMsg = Just (Test Nothing)
-                , showSearch = True
+                , clearMsg = Just (\_ -> Test Nothing)
                 , width = "300px"
                 , placeholder = "Select Test"
                 , disabled = model.test2 == Just "a"
+                , showSearch = True
+                , multiSelect = False
+                , url = Nothing
+                , data = (\_ -> "")
+                , processResults = (\( _, params ) -> ( [], params ))
                 }
             ]
         , div []
             [ select2 SelectTwo
-                { default = Test2 model.test2
+                { defaults =
+                    (testList2 Test2)
+                        |> List.concatMap (\( _, l ) -> l)
+                        |> List.filter (\l -> (Just (Test2 model.test2)) == (l |> Tuple3.first))
+                , id_ = "test-1"
                 , list = testList2 Test2
                 , parents = [ "parent" ]
-                , id_ = "test-2"
-                , clearMsg = Just (Test2 Nothing)
-                , showSearch = True
+                , clearMsg = Just (\_ -> Test2 Nothing)
                 , width = "300px"
                 , placeholder = "Select Test"
                 , disabled = False
+                , showSearch = True
+                , multiSelect = False
+                , url = Nothing
+                , data = (\_ -> "")
+                , processResults = (\( _, params ) -> ( [], params ))
                 }
             ]
         , div []
-            [ select2Multiple SelectTwo
-                { defaults = model.test3 |> List.map Test3
-                , list = testList3 Test3
+            [ select2 SelectTwo
+                { defaults =
+                    (testList3 Test3)
+                        |> List.concatMap (\( _, l ) -> l)
+                        |> List.filter (\l -> model.test3 |> List.map (Test3 >> Just) |> List.member (l |> Tuple3.first))
                 , id_ = "test-3"
+                , list = testList3 Test3
                 , parents = [ "parent" ]
-                , clearMsg = Test3Clear
+                , clearMsg = Just Test3Clear
                 , width = "300px"
                 , placeholder = "Select Test"
                 , disabled = model.test2 == Just "a"
+                , showSearch = False
+                , multiSelect = True
+                , url = Nothing
+                , data = (\_ -> "")
+                , processResults = (\( _, params ) -> ( [], params ))
                 }
             ]
         , div []
-            [ select2Ajax SelectTwo
-                { default = model.test4 |> Maybe.map (\t -> ( Just (Test4 (Just t)), text t.name, t.name )) |> Maybe.withDefault ( Nothing, text "", "" )
-                , url = "//api.github.com/search/repositories"
+            [ select2 SelectTwo
+                { defaults = [ model.test4 |> Maybe.map (\t -> ( Just (Test4 (Just t)), text t.name, t.name )) |> Maybe.withDefault ( Nothing, text "", "" ) ]
+                , url = Just "//api.github.com/search/repositories"
                 , data =
                     (\( url, params ) ->
                         let
@@ -147,10 +170,12 @@ view model =
                 , processResults = processResult
                 , id_ = "test-1"
                 , parents = [ "parent" ]
-                , clearMsg = Just (Test4 Nothing)
+                , clearMsg = Just (\_ -> Test4 Nothing)
                 , showSearch = True
                 , width = "300px"
                 , placeholder = "Select Test"
+                , list = []
+                , multiSelect = False
                 , disabled = model.test2 == Just "a"
                 }
             ]

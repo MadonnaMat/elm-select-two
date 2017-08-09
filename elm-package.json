@@ -1,5 +1,5 @@
 {
-    "version": "1.0.1",
+    "version": "1.0.2",
     "summary": "A mimic of Select2 in Elm",
     "repository": "https://github.com/MadonnaMat/elm-select-two.git",
     "license": "MIT",

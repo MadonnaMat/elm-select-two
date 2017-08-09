@@ -122,12 +122,6 @@ buildDropdown id_ delay sender defaults list showSearch ajaxStuff ( ( x, y ), wi
     }
 
 
-(=>) : a -> b -> ( a, b )
-(=>) =
-    (,)
-infixl 0 =>
-
-
 px : number -> String
 px =
     toString >> flip (++) "px"

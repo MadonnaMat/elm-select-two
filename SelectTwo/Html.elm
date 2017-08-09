@@ -36,7 +36,7 @@ import SelectTwo.Types
         , ScrollInfo
         , SelectTwoConfig
         )
-import SelectTwo.Private exposing (filterGroup, filterList, location, ajaxLocation, (=>), px)
+import SelectTwo.Private exposing (filterGroup, filterList, location, ajaxLocation, px)
 import Json.Decode as JD
 import Tuple3
 
@@ -91,11 +91,11 @@ select2 : (SelectTwoMsg msg -> msg) -> SelectTwoConfig msg -> Html msg
 select2 sender { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, url, processResults, data, delay } =
     span
         [ classList
-            [ "select2 elm-select2 select2-container select2-container--default select2-container--below select2-container--focus" => True
-            , "select2-container--disabled" => disabled
+            [ ( "select2 elm-select2 select2-container select2-container--default select2-container--below select2-container--focus", True )
+            , ( "select2-container--disabled", disabled )
             ]
         , id id_
-        , style [ "width" => width ]
+        , style [ ( "width", width ) ]
         , if not disabled then
             case url of
                 Just u ->
@@ -215,10 +215,10 @@ select2DropdownDraw { id_, sender, defaults, list, showSearch, x, y, width } hov
         span
             [ class "elm-select2 select2-container select2-container--default select2-container--open"
             , style
-                [ "position" => "absolute"
-                , "left" => px x
-                , "top" => px y
-                , "width" => px width
+                [ ( "position", "absolute" )
+                , ( "left", px x )
+                , ( "top", px y )
+                , ( "width", px width )
                 ]
             ]
             [ span [ class "select2-dropdown select2-dropdown--below" ]
@@ -284,8 +284,8 @@ select2ListItem sender defaults hovered option =
     in
         li
             [ classList
-                [ "select2-results__option" => True
-                , "select2-results__option--highlighted" => msg == hovered
+                [ ( "select2-results__option", True )
+                , ( "select2-results__option--highlighted", msg == hovered )
                 ]
             , attribute "aria-selected" (toString (defaults |> List.member option) |> String.toLower)
             , Html.Events.onMouseOver (sender (SelectTwoHovered msg))

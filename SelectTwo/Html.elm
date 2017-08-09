@@ -41,16 +41,52 @@ import Json.Decode as JD
 import Tuple3
 
 
+{-| This is a stylesheet link tag to the select2 minified css, use this while developing, but it is more recommended that you use it in your head once
+you compile the code instead
+-}
 select2Css : Html msg
 select2Css =
     node "link" [ rel "stylesheet", href "//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" ] []
 
 
+{-| This is an event you put on the body of your elm view, so when a user click away it closes the dropdown
+-}
 select2Close : (SelectTwoMsg msg -> msg) -> Attribute msg
 select2Close sender =
     onClick (sender (SelectTwoSelected Nothing))
 
 
+{-| This the select2 dropdown itself, you pass it a sender and a config and you get back a select2 dropdown. Example:
+
+    let
+        testList msg =
+            [ ( Just "a", "a" )
+            , ( Just "b", "b" )
+            , ( Just "c", "c" )
+            ]
+                |> SelectTwo.basicSelectOptions msg
+    in
+        select2 SelectTwo
+            { defaults =
+                (testList Test)
+                    |> List.concatMap (\( _, l ) -> l)
+                    |> List.filter (\l -> (Just (Test model.test)) == (l |> Tuple3.first))
+            , id_ = "test-1"
+            , list = testList Test
+            , parents = [ "parent" ]
+            , clearMsg = Just (\_ -> Test Nothing)
+            , width = "300px"
+            , placeholder = "Select Test"
+            , disabled = False
+            , showSearch = True
+            , multiSelect = False
+            , url = Nothing
+            , data = (\_ -> "")
+            , processResults = (\( _, params ) -> ( [], params ))
+            , delay = 0
+            }
+
+-}
 select2 : (SelectTwoMsg msg -> msg) -> SelectTwoConfig msg -> Html msg
 select2 sender { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, url, processResults, data, delay } =
     span
@@ -153,6 +189,8 @@ multiSelectSpan sender id_ defaults list clearMsg disabled placeholder url =
             ]
 
 
+{-| The dropdown to be shown on the page, this needs to be placed somewhere on the bottome of the view
+-}
 select2Dropdown : Model b msg -> Html msg
 select2Dropdown model =
     case model.selectTwo of
@@ -263,6 +301,8 @@ preventAndStop =
     }
 
 
+{-| Select2 only works when a parent div is not scrollable, this makes parent divs not scrollable while the dropdown is open
+-}
 preventScrolling : String -> Model b msg -> List ( String, String )
 preventScrolling name model =
     let
@@ -278,6 +318,8 @@ preventScrolling name model =
             []
 
 
+{-| Use this helper method in the select2 config in order to get select2's width resolve functionality
+-}
 widthGuess : Float -> List (SelectTwoOption msg) -> String
 widthGuess font list =
     list

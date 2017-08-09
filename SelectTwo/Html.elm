@@ -91,7 +91,7 @@ select2 : (SelectTwoMsg msg -> msg) -> SelectTwoConfig msg -> Html msg
 select2 sender { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, url, processResults, data, delay } =
     span
         [ classList
-            [ "select2 select2-container select2-container--default select2-container--below select2-container--focus" => True
+            [ "select2 elm-select2 select2-container select2-container--default select2-container--below select2-container--focus" => True
             , "select2-container--disabled" => disabled
             ]
         , id id_
@@ -213,7 +213,7 @@ select2DropdownDraw { id_, sender, defaults, list, showSearch, x, y, width } hov
                     list
     in
         span
-            [ class "select2-container select2-container--default select2-container--open"
+            [ class "elm-select2 select2-container select2-container--default select2-container--open"
             , style
                 [ "position" => "absolute"
                 , "left" => px x
@@ -320,10 +320,11 @@ preventScrolling name model =
 
 {-| Use this helper method in the select2 config in order to get select2's width resolve functionality
 -}
-widthGuess : Float -> List (SelectTwoOption msg) -> String
+widthGuess : Float -> List (GroupSelectTwoOption msg) -> String
 widthGuess font list =
     list
-        |> List.map (\( _, _, x ) -> x)
+        |> List.concatMap Tuple.second
+        |> List.map Tuple3.third
         |> List.map (String.length)
         |> List.maximum
         |> Maybe.withDefault 0

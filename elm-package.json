@@ -1,12 +1,16 @@
 {
-    "version": "1.0.0",
+    "version": "1.0.1",
     "summary": "A mimic of Select2 in Elm",
     "repository": "https://github.com/MadonnaMat/elm-select-two.git",
     "license": "MIT",
     "source-directories": [
         "."
     ],
-    "exposed-modules": [ "SelectTwo", "SelectTwo.Types", "SelectTwo.Html" ],
+    "exposed-modules": [
+        "SelectTwo",
+        "SelectTwo.Types",
+        "SelectTwo.Html"
+    ],
     "dependencies": {
         "Fresheyeball/elm-tuple-extra": "3.0.0 <= v < 4.0.0",
         "elm-community/list-extra": "6.1.0 <= v < 7.0.0",

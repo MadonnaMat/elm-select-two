@@ -1,8 +1,8 @@
 {
     "version": "1.0.0",
-    "summary": "A Reimagining of Select2 in Elm",
+    "summary": "A mimic of Select2 in Elm",
     "repository": "https://github.com/MadonnaMat/elm-select-two.git",
-    "license": "BSD3",
+    "license": "MIT",
     "source-directories": [
         "."
     ],

@@ -5,7 +5,7 @@ module SelectTwo.Types exposing (..)
 
 # Types
 
-@docs SelectTwoMsg, Model, SelectTwoConfig, AjaxParams, GroupSelectTwoOption, SelectTwoOption, SelectTwo, SelectTwoDropdown, SelectTwoAjaxStuff, ScrollInfo
+@docs SelectTwoConfig, SelectTwoMsg, Model,SelectTwo, SelectTwoDropdown, GroupSelectTwoOption, SelectTwoOption, SelectTwoAjaxStuff, AjaxParams, ScrollInfo
 
 -}
 
@@ -29,13 +29,13 @@ type SelectTwoMsg a
     | ResultScroll ScrollInfo
 
 
-{-| Model structure needed for selectTwo
+{-| Model structure needed for selectTwo, all records using selectTwo should have this structure
 -}
 type alias Model b a =
     { b | selectTwo : Maybe (SelectTwo a) }
 
 
-{-| Config for SelectTwo
+{-| Config for SelectTwo used when initializing your select2 box
 -}
 type alias SelectTwoConfig a =
     { defaults : List (SelectTwoOption a)
@@ -65,13 +65,13 @@ type alias AjaxParams =
     }
 
 
-{-| Grouped SelectTwoOption
+{-| Grouped SelectTwoOption, first option in the tuple is the name of the group
 -}
 type alias GroupSelectTwoOption a =
     ( String, List (SelectTwoOption a) )
 
 
-{-| Rows in a select table
+{-| Rows in a select table, first option is the command message to be sent, second is the html to be displayed, and third is the string to search on
 -}
 type alias SelectTwoOption a =
     ( Maybe a, Html a, String )
@@ -111,8 +111,7 @@ type alias SelectTwoAjaxStuff a =
     ( String, ( String, AjaxParams ) -> String, ( String, AjaxParams ) -> ( List (GroupSelectTwoOption a), AjaxParams ), AjaxParams )
 
 
-{-| Information coming from scroll events
--}
+{-| -}
 type alias ScrollInfo =
     { scrollHeight : Int
     , scrollTop : Int

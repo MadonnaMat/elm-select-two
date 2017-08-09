@@ -1,15 +1,42 @@
-module SelectTwo.Html exposing (select2, select2Dropdown, select2Css, select2Close)
+module SelectTwo.Html exposing (select2, select2Dropdown, select2Css, select2Close, preventScrolling, widthGuess)
 
-{-| Library for dropdown views
+{-| this file is for all things related to select2 in the view. this will build your html and has a few helpers for some other areas
+
+
+# Essentials
+
+@docs select2Css, select2, select2Dropdown, select2Close
+
+
+# Helpers
+
+@docs preventScrolling, widthGuess
+
 -}
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, Attribute, div, span, text, input, ul, li, strong, node, b)
+import Html.Attributes exposing (class, style, id, classList, attribute, rel, href)
+import Html.Events exposing (onClick, onInput)
 import List.Extra
 import SelectTwo
-import SelectTwo.Types exposing (..)
-import SelectTwo.Helpers exposing ((=>), px)
+import SelectTwo.Types
+    exposing
+        ( SelectTwoMsg
+            ( SetSelectTwoSearch
+            , STNull
+            , ResultScroll
+            , SelectTwoHovered
+            , SelectTwoSelected
+            )
+        , SelectTwoOption
+        , GroupSelectTwoOption
+        , Model
+        , SelectTwoDropdown
+        , SelectTwoAjaxStuff
+        , ScrollInfo
+        , SelectTwoConfig
+        )
+import SelectTwo.Private exposing (filterGroup, filterList, location, ajaxLocation, (=>), px)
 import Json.Decode as JD
 import Tuple3
 
@@ -36,10 +63,10 @@ select2 sender { defaults, list, parents, clearMsg, showSearch, width, placehold
         , if not disabled then
             case url of
                 Just u ->
-                    Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.ajaxLocation id_ delay sender defaults parents (showSearch && not multiSelect) u data processResults)
+                    Html.Events.onWithOptions "click" preventAndStop <| (ajaxLocation id_ delay sender defaults parents (showSearch && not multiSelect) u data processResults)
 
                 Nothing ->
-                    Html.Events.onWithOptions "click" preventAndStop <| (SelectTwo.location id_ delay sender defaults list parents (showSearch && not multiSelect))
+                    Html.Events.onWithOptions "click" preventAndStop <| (location id_ delay sender defaults list parents (showSearch && not multiSelect))
           else
             attribute "data-blank" ""
         ]
@@ -191,12 +218,12 @@ listOrGroup sender defaults list hovered search =
         list
             |> List.head
             |> Maybe.map (Tuple.second)
-            |> Maybe.map (List.filter (SelectTwo.filterList search))
+            |> Maybe.map (List.filter (filterList search))
             |> Maybe.map (List.map (select2ListItem sender defaults hovered))
             |> Maybe.withDefault []
     else
         list
-            |> List.map (SelectTwo.filterGroup search)
+            |> List.map (filterGroup search)
             |> List.map (select2ListGroup sender defaults hovered)
 
 
@@ -234,3 +261,31 @@ preventAndStop =
     { preventDefault = True
     , stopPropagation = True
     }
+
+
+preventScrolling : String -> Model b msg -> List ( String, String )
+preventScrolling name model =
+    let
+        prevent =
+            model.selectTwo
+                |> Maybe.map .parents
+                |> Maybe.withDefault []
+                |> List.member name
+    in
+        if prevent then
+            [ ( "overflow", "hidden" ) ]
+        else
+            []
+
+
+widthGuess : Float -> List (SelectTwoOption msg) -> String
+widthGuess font list =
+    list
+        |> List.map (\( _, _, x ) -> x)
+        |> List.map (String.length)
+        |> List.maximum
+        |> Maybe.withDefault 0
+        |> toFloat
+        |> (*) (font / 1.5)
+        |> (+) 30
+        |> px

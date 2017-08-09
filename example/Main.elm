@@ -9,7 +9,6 @@ import SelectTwo.Types exposing (..)
 import Task
 import Tuple3
 import Json.Decode as JD
-import SelectTwo.Helpers exposing ((=>))
 
 
 type alias Model =
@@ -294,9 +293,9 @@ testList3 msg =
                 ( Just (msg a)
                 , span
                     [ style
-                        [ "width" => "100%"
-                        , "text-align" => "center"
-                        , "display" => "inline-block"
+                        [ ( "width", "100%" )
+                        , ( "text-align", "center" )
+                        , ( "display", "inline-block" )
                         ]
                     ]
                     [ text b

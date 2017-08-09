@@ -1,15 +1,19 @@
-module SelectTwo exposing (update, new, map, setFilter, filterList, filterGroup, location, ajaxLocation, basicSelectOptions, basicGroupSelectOptions, preventScrolling, widthGuess)
+module SelectTwo exposing (update, new, map, setSearch, basicSelectOptions, basicGroupSelectOptions)
 
-{-| SelectTwo Methods
+{-| This library is the basic controls for your model's select2 object and some helper methods
+
+#Basic Controls
+@docs update, new, map, setSearch
 
 
-# Methods
+# Helper Methods
 
-@docs update, new, map, setFilter, filterList, filterGroup, location, ajaxLocation, basicSelectOptions, basicGroupSelectOptions, preventScrolling, widthGuess
+@docs basicSelectOptions, basicGroupSelectOptions
 
 -}
 
 import SelectTwo.Types exposing (SelectTwoMsg(..), SelectTwo, SelectTwoDropdown, SelectTwoOption, AjaxParams, SelectTwoAjaxStuff, GroupSelectTwoOption, Model)
+import SelectTwo.Private exposing (filterList, filterGroup, px, asTuple)
 import Json.Decode as JD
 import List.Extra
 import Task
@@ -20,9 +24,17 @@ import Http
 import Process
 import Time
 import Html exposing (text)
-import SelectTwo.Helpers exposing (closest, px, asTuple)
 
 
+{-| used in your elm project's update as a way to control the select two boxes on screen it is used by
+
+    yourUpdate : Msg -> Model -> ( Model, Cmd Msg )
+    yourUpdate msg model =
+        case msg of
+            SelectTwo stmsg ->
+                update stmsg model
+
+-}
 update : SelectTwoMsg msg -> Model b msg -> ( Model b msg, Cmd msg )
 update msg model =
     case msg of
@@ -40,7 +52,7 @@ update msg model =
             { model | selectTwo = Nothing } ! [ msg |> Maybe.map send |> Maybe.withDefault Cmd.none ]
 
         SetSelectTwoSearch filter ->
-            setFilter filter model
+            setSearch filter model
                 ! [ model.selectTwo
                         |> Maybe.map .dropdown
                         |> Maybe.andThen (\dd -> delayedSend (dd.delay) ((dd.sender) (DelayedSelectTwoAjax filter)) |> Just)
@@ -165,11 +177,15 @@ ajaxCmd f model =
             Cmd.none
 
 
+{-| Create a new instance of the selectTwo record in your model
+-}
 new : List String -> SelectTwoDropdown msg -> Model b msg -> Model b msg
-new p dd model =
-    { model | selectTwo = Just { dropdown = dd, hovered = Nothing, search = Nothing, parents = p, list = Nothing, ajaxStuff = Nothing } }
+new parents dropdown model =
+    { model | selectTwo = Just { dropdown = dropdown, hovered = Nothing, search = Nothing, parents = parents, list = Nothing, ajaxStuff = Nothing } }
 
 
+{-| modify selectTwo record in your model
+-}
 map : (SelectTwo msg -> SelectTwo msg) -> Model b msg -> Model b msg
 map f model =
     let
@@ -179,8 +195,10 @@ map f model =
         { model | selectTwo = newSelectTwo }
 
 
-setFilter : String -> Model b msg -> Model b msg
-setFilter filter =
+{-| set the search parameter in your selectTwo record
+-}
+setSearch : String -> Model b msg -> Model b msg
+setSearch filter =
     let
         search =
             if filter == "" then
@@ -191,133 +209,37 @@ setFilter filter =
         map (\s -> { s | search = search })
 
 
-filterGroup : Maybe String -> GroupSelectTwoOption a -> GroupSelectTwoOption a
-filterGroup filter list =
-    list |> Tuple.mapSecond (List.filter (filterList filter))
-
-
-filterList : Maybe String -> SelectTwoOption a -> Bool
-filterList filter ( _, _, text ) =
-    filter
-        |> Maybe.andThen ((String.toLower) >> (flip String.contains (text |> String.toLower)) >> Just)
-        |> Maybe.withDefault True
-
-
 send : msg -> Cmd msg
 send msg =
     Task.succeed msg
         |> Task.perform identity
 
 
-parentSize : String -> List String -> JD.Decoder Float
-parentSize dir oldParents =
-    let
-        uncons =
-            oldParents |> List.Extra.uncons
-    in
-        case uncons of
-            Just ( parent, parents ) ->
-                JD.map2 (+)
-                    (parentSize dir parents)
-                    (JD.map2 (-)
-                        ((closest parent << JD.field ("offset" ++ dir)) JD.float)
-                        ((closest parent << JD.field ("scroll" ++ dir)) JD.float)
-                    )
+{-| turn a list of Tuples into a list of GroupSelectTwoOptions with one group. The first parameter is their shared trigger message, the
+second parameter is the list of tuples which are formatted as (Key, "Display"), and the return can be used in the list option of the config
 
-            Nothing ->
-                JD.field "scrollTop" JD.float
+    [ ( Just "a", "a" )
+    , ( Just "b", "b" )
+    , ( Just "c", "c" )
+    ]
+        |> SelectTwo.basicSelectOptions Test
 
-
-location : String -> Float -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> List String -> Bool -> JD.Decoder msg
-location id_ delay sender defaults list parents showSearch =
-    JD.map2 (,)
-        (JD.map2 (,)
-            (JD.map2 (+)
-                (JD.at [ "offsetLeft" ] JD.float)
-                (parentSize "Left" parents)
-            )
-            (JD.map2 (+)
-                (JD.at [ "clientHeight" ] JD.float)
-                (JD.map2 (+)
-                    (JD.at [ "offsetTop" ] JD.float)
-                    (parentSize "Top" parents)
-                )
-            )
-        )
-        (JD.at [ "offsetWidth" ] JD.float)
-        |> JD.map
-            (buildDropdown id_
-                delay
-                sender
-                defaults
-                list
-                showSearch
-                Nothing
-            )
-        |> JD.map ((SelectTwoTrigger parents) >> sender)
-        |> (JD.field "target" << closest "select2")
-
-
-ajaxLocation :
-    String
-    -> Float
-    -> (SelectTwoMsg msg -> msg)
-    -> List (SelectTwoOption msg)
-    -> List String
-    -> Bool
-    -> String
-    -> (( String, AjaxParams ) -> String)
-    -> (( String, AjaxParams ) -> ( List (GroupSelectTwoOption msg), AjaxParams ))
-    -> JD.Decoder msg
-ajaxLocation id_ delay sender defaults parents showSearch url data processResults =
-    JD.map2 (,)
-        (JD.map2 (,)
-            (JD.map2 (+)
-                (JD.at [ "offsetLeft" ] JD.float)
-                (parentSize "Left" parents)
-            )
-            (JD.map2 (+)
-                (JD.at [ "clientHeight" ] JD.float)
-                (JD.map2 (+)
-                    (JD.at [ "offsetTop" ] JD.float)
-                    (parentSize "Top" parents)
-                )
-            )
-        )
-        (JD.at [ "offsetWidth" ] JD.float)
-        |> JD.map
-            (buildDropdown id_
-                delay
-                sender
-                defaults
-                []
-                showSearch
-                (Just ( url, data, processResults, { page = 1, term = "", more = False, loading = True } ))
-            )
-        |> JD.map ((SelectTwoTrigger parents) >> sender)
-        |> (JD.field "target" << closest "select2")
-
-
-buildDropdown : String -> Float -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Bool -> Maybe (SelectTwoAjaxStuff msg) -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
-buildDropdown id_ delay sender defaults list showSearch ajaxStuff ( ( x, y ), width ) =
-    { id_ = id_
-    , sender = sender
-    , defaults = defaults
-    , list = list
-    , showSearch = showSearch
-    , x = x
-    , y = y
-    , width = width
-    , ajaxStuff = ajaxStuff
-    , delay = delay
-    }
-
-
+-}
 basicSelectOptions : (a -> msg) -> List ( a, String ) -> List (GroupSelectTwoOption msg)
 basicSelectOptions msg list =
     [ ( "", List.map (selectOption msg) list ) ]
 
 
+{-| turn a list of Tuples3 into a list of GroupSelectTwoOptions with actual grouping. The first parameter is their shared trigger message, the
+second parameter is the list of tuples which are formatted as (Key, "Display", "Group Name"), and the return can be used in the list option of the config
+
+    [ ( Just "a", "a", "Group 1")
+    , ( Just "b", "b", "Group 1")
+    , ( Just "c", "c", "Group 2")
+    ]
+        |> SelectTwo.basicSelectOptions Test
+
+-}
 basicGroupSelectOptions : (a -> msg) -> List ( a, String, String ) -> List (GroupSelectTwoOption msg)
 basicGroupSelectOptions msg list =
     list
@@ -338,32 +260,3 @@ selectGroup msg list =
 selectOption : (a -> msg) -> ( a, String ) -> SelectTwoOption msg
 selectOption msg ( val, txt ) =
     ( Just (msg val), text txt, txt )
-
-
-preventScrolling : String -> Model b msg -> List ( String, String )
-preventScrolling name model =
-    let
-        prevent =
-            model.selectTwo
-                |> Maybe.map .parents
-                |> Maybe.withDefault []
-                |> List.member name
-    in
-        if prevent then
-            [ ( "overflow", "hidden" ) ]
-        else
-            []
-
-
-widthGuess : Float -> List (SelectTwoOption msg) -> String
-widthGuess font list =
-    (list
-        |> List.map (\( _, _, x ) -> x)
-        |> List.map (String.length)
-        |> List.maximum
-        |> Maybe.withDefault 0
-        |> toFloat
-    )
-        * (font / 1.5)
-        + 30
-        |> px

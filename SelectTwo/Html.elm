@@ -38,7 +38,7 @@ import SelectTwo.Types
         )
 import SelectTwo.Private exposing (filterGroup, filterList, location, ajaxLocation, px)
 import Json.Decode as JD
-import Tuple3
+import Tuple4
 
 
 {-| This is a stylesheet link tag to the select2 minified css, use this while developing, but it is more recommended that you use it in your head once
@@ -70,7 +70,7 @@ select2Close sender =
             { defaults =
                 (testList Test)
                     |> List.concatMap (\( _, l ) -> l)
-                    |> List.filter (\l -> (Just (Test model.test)) == (l |> Tuple3.first))
+                    |> List.filter (\l -> (Just (Test model.test)) == (l |> Tuple4.first))
             , id_ = "test-1"
             , list = testList Test
             , parents = [ "parent" ]
@@ -88,7 +88,7 @@ select2Close sender =
 
 -}
 select2 : (SelectTwoMsg msg -> msg) -> SelectTwoConfig msg -> Html msg
-select2 sender { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, url, processResults, data, delay } =
+select2 sender { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, url, processResults, data, delay, noResultsMessage } =
     span
         [ classList
             [ ( "select2 elm-select2 select2-container select2-container--default select2-container--below select2-container--focus", True )
@@ -99,10 +99,10 @@ select2 sender { defaults, list, parents, clearMsg, showSearch, width, placehold
         , if not disabled then
             case url of
                 Just u ->
-                    Html.Events.onWithOptions "click" preventAndStop <| (ajaxLocation id_ delay sender defaults parents (showSearch && not multiSelect) u data processResults)
+                    Html.Events.onWithOptions "click" preventAndStop <| (ajaxLocation id_ delay sender defaults parents (showSearch && not multiSelect) noResultsMessage u data processResults)
 
                 Nothing ->
-                    Html.Events.onWithOptions "click" preventAndStop <| (location id_ delay sender defaults list parents (showSearch && not multiSelect))
+                    Html.Events.onWithOptions "click" preventAndStop <| (location id_ delay sender defaults list parents (showSearch && not multiSelect) noResultsMessage)
           else
             attribute "data-blank" ""
         ]
@@ -118,8 +118,8 @@ select2 sender { defaults, list, parents, clearMsg, showSearch, width, placehold
 singleSelectSpan : Maybe (SelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> String -> Html msg
 singleSelectSpan default clearMsg placeholder =
     let
-        ( defaultMsg, defaultText, _ ) =
-            default |> Maybe.withDefault ( Nothing, text "", "" )
+        ( defaultMsg, defaultText, _, _ ) =
+            default |> Maybe.withDefault ( Nothing, text "", "", False )
     in
         span [ class "select2-selection select2-selection--single" ]
             [ span [ class "select2-selection__rendered" ]
@@ -155,7 +155,7 @@ multiSelectSpan sender id_ defaults list clearMsg disabled placeholder url =
                     |> List.concatMap Tuple.second
                     |> List.filter (flip List.member defaults)
                     |> List.map
-                        (\( msg, txt, _ ) ->
+                        (\( msg, txt, _, _ ) ->
                             li [ class "select2-selection__choice" ]
                                 [ case clearMsg of
                                     Just clrMsg ->
@@ -201,16 +201,17 @@ select2Dropdown model =
             text ""
 
 
-select2DropdownDraw : SelectTwoDropdown msg -> Maybe msg -> Maybe String -> Maybe (List (GroupSelectTwoOption msg)) -> Maybe (SelectTwoAjaxStuff msg) -> Html msg
-select2DropdownDraw { id_, sender, defaults, list, showSearch, x, y, width } hovered search ajaxList ajaxStuff =
+select2DropdownDraw : SelectTwoDropdown msg -> Maybe msg -> Maybe String -> List (GroupSelectTwoOption msg) -> Maybe (SelectTwoAjaxStuff msg) -> Html msg
+select2DropdownDraw { id_, sender, defaults, list, showSearch, x, y, width, isAjax, noResultsMessage } hovered search ajaxList ajaxStuff =
     let
         theList =
-            case ajaxList of
-                Just l ->
-                    l
-
-                Nothing ->
-                    list
+            if isAjax then
+                if (Maybe.map (\( _, _, _, params ) -> params.loading) ajaxStuff |> Maybe.withDefault False) && List.isEmpty ajaxList then
+                    [ ( "", [ ( Nothing, text "Searching", "", False ) ] ) ]
+                else
+                    ajaxList
+            else
+                list
     in
         span
             [ class "elm-select2 select2-container select2-container--default select2-container--open"
@@ -236,7 +237,11 @@ select2DropdownDraw { id_, sender, defaults, list, showSearch, x, y, width } hov
                     text ""
                 , span [ class "select2-results" ]
                     [ ul [ class "select2-results__options", Html.Events.on "scroll" <| scrollPosition (ResultScroll >> sender) ]
-                        (listOrGroup sender defaults theList hovered search)
+                        (if isAjax && (theList == [ ( "", [] ) ] || List.isEmpty theList) then
+                            [ noResultsFound noResultsMessage ]
+                         else
+                            listOrGroup sender defaults theList hovered search
+                        )
                     ]
                 ]
             ]
@@ -279,19 +284,38 @@ select2ListGroup sender defaults hovered ( label, list ) =
 select2ListItem : (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> Maybe msg -> SelectTwoOption msg -> Html msg
 select2ListItem sender defaults hovered option =
     let
-        ( msg, display, _ ) =
+        ( msg, display, _, enabled ) =
             option
     in
         li
-            [ classList
-                [ ( "select2-results__option", True )
-                , ( "select2-results__option--highlighted", msg == hovered )
+            (List.concatMap identity
+                [ [ classList
+                        [ ( "select2-results__option", True )
+                        , ( "select2-results__option--highlighted", msg == hovered )
+                        ]
+                  , Html.Events.onMouseOver (sender (SelectTwoHovered msg))
+                  ]
+                , if enabled then
+                    [ onClick (sender (SelectTwoSelected msg))
+                    , attribute "aria-selected" (toString (defaults |> List.member option) |> String.toLower)
+                    ]
+                  else
+                    [ attribute "aria-disabled" (toString (not enabled) |> String.toLower)
+                    ]
                 ]
-            , attribute "aria-selected" (toString (defaults |> List.member option) |> String.toLower)
-            , Html.Events.onMouseOver (sender (SelectTwoHovered msg))
-            , onClick (sender (SelectTwoSelected msg))
-            ]
+            )
             [ display ]
+
+
+noResultsFound : Maybe String -> Html msg
+noResultsFound noResults =
+    li
+        [ classList
+            [ ( "select2-results__option", True )
+            , ( "select2-results__message", True )
+            ]
+        ]
+        [ text <| Maybe.withDefault "No Results Found" noResults ]
 
 
 preventAndStop : { preventDefault : Bool, stopPropagation : Bool }
@@ -324,7 +348,7 @@ widthGuess : Float -> List (GroupSelectTwoOption msg) -> String
 widthGuess font list =
     list
         |> List.concatMap Tuple.second
-        |> List.map Tuple3.third
+        |> List.map Tuple4.third
         |> List.map (String.length)
         |> List.maximum
         |> Maybe.withDefault 0

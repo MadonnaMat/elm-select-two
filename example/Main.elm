@@ -7,7 +7,7 @@ import SelectTwo exposing (..)
 import SelectTwo.Html exposing (..)
 import SelectTwo.Types exposing (..)
 import Task
-import Tuple3
+import Tuple4
 import Json.Decode as JD
 
 
@@ -116,7 +116,7 @@ view model =
                     { defaults =
                         (testList Test)
                             |> List.concatMap (\( _, l ) -> l)
-                            |> List.filter (\l -> (Just (Test model.test)) == (l |> Tuple3.first))
+                            |> List.filter (\l -> (Just (Test model.test)) == (l |> Tuple4.first))
                     , id_ = "test-1"
                     , list = testList Test
                     , parents = []
@@ -130,6 +130,7 @@ view model =
                     , data = (\_ -> "")
                     , processResults = (\( _, params ) -> ( [], params ))
                     , delay = 0
+                    , noResultsMessage = Nothing
                     }
                 ]
             ]
@@ -140,7 +141,7 @@ view model =
                     { defaults =
                         (testList2 Test2)
                             |> List.concatMap (\( _, l ) -> l)
-                            |> List.filter (\l -> (Just (Test2 model.test2)) == (l |> Tuple3.first))
+                            |> List.filter (\l -> (Just (Test2 model.test2)) == (l |> Tuple4.first))
                     , id_ = "test-2"
                     , list = testList2 Test2
                     , parents = [ "p1" ]
@@ -154,6 +155,7 @@ view model =
                     , data = (\_ -> "")
                     , processResults = (\( _, params ) -> ( [], params ))
                     , delay = 0
+                    , noResultsMessage = Nothing
                     }
                 ]
             ]
@@ -171,7 +173,7 @@ view model =
                     { defaults =
                         (testList3 Test3)
                             |> List.concatMap (\( _, l ) -> l)
-                            |> List.filter (\l -> model.test3 |> List.map (Test3 >> Just) |> List.member (l |> Tuple3.first))
+                            |> List.filter (\l -> model.test3 |> List.map (Test3 >> Just) |> List.member (l |> Tuple4.first))
                     , id_ = "test-3"
                     , list = testList3 Test3
                     , parents = [ "p2" ]
@@ -185,6 +187,7 @@ view model =
                     , data = (\_ -> "")
                     , processResults = (\( _, params ) -> ( [], params ))
                     , delay = 0
+                    , noResultsMessage = Nothing
                     }
                 ]
             ]
@@ -192,7 +195,7 @@ view model =
             [ text "Ajax, Single Select"
             , div []
                 [ select2 SelectTwo
-                    { defaults = [ model.test4 |> Maybe.map (\t -> ( Just (Test4 (Just t)), text t.name, t.name )) |> Maybe.withDefault ( Nothing, text "", "" ) ]
+                    { defaults = [ model.test4 |> Maybe.map (\t -> ( Just (Test4 (Just t)), text t.name, t.name, True )) |> Maybe.withDefault ( Nothing, text "", "", True ) ]
                     , url = Just "//api.github.com/search/repositories"
                     , data =
                         (\( url, params ) ->
@@ -216,6 +219,7 @@ view model =
                     , multiSelect = False
                     , disabled = model.test2 == Just "a"
                     , delay = 300
+                    , noResultsMessage = Just "YOU GET NOTHING! YOU LOSE GOODDAY SIR!"
                     }
                 ]
             ]
@@ -223,7 +227,7 @@ view model =
             [ text "Ajax, Multi Select"
             , div []
                 [ select2 SelectTwo
-                    { defaults = model.test5 |> List.map (\t -> ( Just (Test5 (Just t)), text t.name, t.name ))
+                    { defaults = model.test5 |> List.map (\t -> ( Just (Test5 (Just t)), text t.name, t.name, True ))
                     , url = Just "//api.github.com/search/repositories"
                     , data =
                         (\( url, params ) ->
@@ -247,6 +251,7 @@ view model =
                     , multiSelect = True
                     , disabled = model.test2 == Just "a"
                     , delay = 300
+                    , noResultsMessage = Nothing
                     }
                 ]
             ]
@@ -323,6 +328,7 @@ testList3 msg =
                     [ text b
                     ]
                 , b
+                , True
                 )
             )
     )

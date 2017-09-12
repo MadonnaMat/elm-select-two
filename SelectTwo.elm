@@ -43,7 +43,7 @@ update msg model =
                 newModel =
                     new p dd model
             in
-                newModel ! [ Dom.focus ((dd.id_) ++ "--search") |> Task.attempt (STRes >> (dd.sender)), ajaxCmd identity (map (\s -> { s | list = Just [] }) newModel) ]
+                newModel ! [ Dom.focus ((dd.id_) ++ "--search") |> Task.attempt (STRes >> (dd.sender)), ajaxCmd identity False (map (\s -> { s | list = [] }) newModel) ]
 
         SelectTwoHovered hovered ->
             map (\s -> { s | hovered = hovered }) model ! []
@@ -67,20 +67,26 @@ update msg model =
                         |> Maybe.andThen
                             (\search ->
                                 if search == filter then
-                                    ajaxCmd (\p -> { p | page = 1, term = filter, more = False, loading = True }) (map (\s -> { s | list = Just [] }) model) |> Just
+                                    ajaxCmd (\p -> { p | page = 1, term = filter, more = False, loading = True }) True (map (\s -> { s | list = [] }) model) |> Just
                                 else
                                     Nothing
                             )
                         |> Maybe.withDefault Cmd.none
                   ]
 
-        SelectTwoAjax ( url, data, processResults, params ) (Ok str) ->
+        SelectTwoAjax ( url, data, processResults, params ) reset (Ok str) ->
             let
                 ( list, newParams ) =
                     processResults ( str, { params | loading = False } )
 
+                tempList =
+                    if reset then
+                        list
+                    else
+                        (model.selectTwo |> Maybe.map .list |> Maybe.withDefault []) ++ list
+
                 newList =
-                    ((model.selectTwo |> Maybe.andThen .list |> Maybe.withDefault []) ++ list)
+                    tempList
                         |> List.Extra.groupWhile (\x y -> Tuple.first x == Tuple.first y)
                         |> (List.map
                                 (asTuple
@@ -89,10 +95,10 @@ update msg model =
                                 )
                            )
             in
-                map (\s -> { s | list = Just newList, ajaxStuff = Just ( url, data, processResults, newParams ) }) model ! []
+                map (\s -> { s | list = newList, ajaxStuff = Just ( url, data, processResults, newParams ) }) model ! []
 
-        SelectTwoAjax ajaxStuff (Err str) ->
-            map (\s -> { s | list = Nothing, ajaxStuff = Just ajaxStuff }) model ! []
+        SelectTwoAjax ajaxStuff reset (Err str) ->
+            map (\s -> { s | list = [], ajaxStuff = Just ajaxStuff }) model ! []
 
         ResultScroll { scrollHeight, scrollTop } ->
             checkScrollPage scrollTop scrollHeight model
@@ -127,7 +133,7 @@ sendPageIncrement model scrollTop scrollHeight ( url, data, processResults, para
             newModel =
                 map (\s -> { s | ajaxStuff = Just ( url, data, processResults, { params | loading = True, page = params.page + 1 } ) }) model
         in
-            Just (newModel ! [ ajaxCmd identity newModel ])
+            Just (newModel ! [ ajaxCmd identity False newModel ])
     else
         Nothing
 
@@ -150,8 +156,8 @@ delayedSend milli msg =
         |> Task.perform (\_ -> msg)
 
 
-ajaxCmd : (AjaxParams -> AjaxParams) -> Model b msg -> Cmd msg
-ajaxCmd f model =
+ajaxCmd : (AjaxParams -> AjaxParams) -> Bool -> Model b msg -> Cmd msg
+ajaxCmd f reset model =
     case model.selectTwo of
         Just selectTwo ->
             let
@@ -168,7 +174,7 @@ ajaxCmd f model =
                     Just ( url, data, processResults, params ) ->
                         data ( url, f params )
                             |> Http.getString
-                            |> Http.send ((SelectTwoAjax ( url, data, processResults, f params )) >> sender)
+                            |> Http.send ((SelectTwoAjax ( url, data, processResults, f params ) reset) >> sender)
 
                     Nothing ->
                         Cmd.none
@@ -181,7 +187,7 @@ ajaxCmd f model =
 -}
 new : List String -> SelectTwoDropdown msg -> Model b msg -> Model b msg
 new parents dropdown model =
-    { model | selectTwo = Just { dropdown = dropdown, hovered = Nothing, search = Nothing, parents = parents, list = Nothing, ajaxStuff = Nothing } }
+    { model | selectTwo = Just { dropdown = dropdown, hovered = Nothing, search = Nothing, parents = parents, list = [], ajaxStuff = dropdown.ajaxStuff } }
 
 
 {-| modify selectTwo record in your model
@@ -259,4 +265,4 @@ selectGroup msg list =
 
 selectOption : (a -> msg) -> ( a, String ) -> SelectTwoOption msg
 selectOption msg ( val, txt ) =
-    ( Just (msg val), text txt, txt )
+    ( Just (msg val), text txt, txt, True )

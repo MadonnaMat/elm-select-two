@@ -12,14 +12,14 @@ filterGroup filter list =
 
 
 filterList : Maybe String -> SelectTwoOption a -> Bool
-filterList filter ( _, _, text ) =
+filterList filter ( _, _, text, _ ) =
     filter
         |> Maybe.andThen ((String.toLower) >> (flip String.contains (text |> String.toLower)) >> Just)
         |> Maybe.withDefault True
 
 
-location : String -> Float -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> List String -> Bool -> JD.Decoder msg
-location id_ delay sender defaults list parents showSearch =
+location : String -> Float -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> List String -> Bool -> Maybe String -> JD.Decoder msg
+location id_ delay sender defaults list parents showSearch noResultsMessage =
     JD.map2 (,)
         (JD.map2 (,)
             (JD.map2 (+)
@@ -43,6 +43,8 @@ location id_ delay sender defaults list parents showSearch =
                 list
                 showSearch
                 Nothing
+                False
+                noResultsMessage
             )
         |> JD.map ((SelectTwoTrigger parents) >> sender)
         |> (JD.field "target" << closest "select2")
@@ -55,11 +57,12 @@ ajaxLocation :
     -> List (SelectTwoOption msg)
     -> List String
     -> Bool
+    -> Maybe String
     -> String
     -> (( String, AjaxParams ) -> String)
     -> (( String, AjaxParams ) -> ( List (GroupSelectTwoOption msg), AjaxParams ))
     -> JD.Decoder msg
-ajaxLocation id_ delay sender defaults parents showSearch url data processResults =
+ajaxLocation id_ delay sender defaults parents showSearch noResultsMessage url data processResults =
     JD.map2 (,)
         (JD.map2 (,)
             (JD.map2 (+)
@@ -83,6 +86,8 @@ ajaxLocation id_ delay sender defaults parents showSearch url data processResult
                 []
                 showSearch
                 (Just ( url, data, processResults, { page = 1, term = "", more = False, loading = True } ))
+                True
+                noResultsMessage
             )
         |> JD.map ((SelectTwoTrigger parents) >> sender)
         |> (JD.field "target" << closest "select2")
@@ -107,8 +112,8 @@ parentSize dir oldParents =
                 JD.field "scrollTop" JD.float
 
 
-buildDropdown : String -> Float -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Bool -> Maybe (SelectTwoAjaxStuff msg) -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
-buildDropdown id_ delay sender defaults list showSearch ajaxStuff ( ( x, y ), width ) =
+buildDropdown : String -> Float -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Bool -> Maybe (SelectTwoAjaxStuff msg) -> Bool -> Maybe String -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
+buildDropdown id_ delay sender defaults list showSearch ajaxStuff isAjax noResultsMessage ( ( x, y ), width ) =
     { id_ = id_
     , sender = sender
     , defaults = defaults
@@ -119,6 +124,8 @@ buildDropdown id_ delay sender defaults list showSearch ajaxStuff ( ( x, y ), wi
     , width = width
     , ajaxStuff = ajaxStuff
     , delay = delay
+    , isAjax = isAjax
+    , noResultsMessage = noResultsMessage
     }
 
 

@@ -262,6 +262,7 @@ listOrGroup sender defaults list hovered search =
             |> List.head
             |> Maybe.map (Tuple.second)
             |> Maybe.map (List.filter (filterList search))
+            |> Maybe.map (List.Extra.uniqueBy selectTwoUniq)
             |> Maybe.map (List.map (select2ListItem sender defaults hovered))
             |> Maybe.withDefault []
     else
@@ -270,12 +271,18 @@ listOrGroup sender defaults list hovered search =
             |> List.map (select2ListGroup sender defaults hovered)
 
 
+selectTwoUniq : SelectTwoOption msg -> ( String, String, String, String )
+selectTwoUniq ( a, b, c, d ) =
+    ( toString a, toString b, c, toString d )
+
+
 select2ListGroup : (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> Maybe msg -> GroupSelectTwoOption msg -> Html msg
 select2ListGroup sender defaults hovered ( label, list ) =
     li [ class "select2-results__option" ]
         [ strong [ class "select2-results__group" ] [ text label ]
         , ul [ class "select2-results__options select2-results__options--nested" ]
             (list
+                |> List.Extra.uniqueBy selectTwoUniq
                 |> List.map (select2ListItem sender defaults hovered)
             )
         ]

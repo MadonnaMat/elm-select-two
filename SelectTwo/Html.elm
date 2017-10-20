@@ -251,7 +251,10 @@ scrollPosition : (ScrollInfo -> a) -> JD.Decoder a
 scrollPosition wrapper =
     JD.map2 ScrollInfo
         (JD.at [ "target", "scrollHeight" ] JD.int)
-        (JD.at [ "target", "scrollTop" ] JD.int)
+        (JD.map2 (+)
+            (JD.at [ "target", "scrollTop" ] JD.int)
+            (JD.at [ "target", "clientHeight" ] JD.int)
+        )
         |> JD.map wrapper
 
 

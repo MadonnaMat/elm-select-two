@@ -36,7 +36,17 @@ import Html exposing (text)
     yourUpdate msg model =
         case msg of
             SelectTwo stmsg ->
-                update stmsg model
+                case stmsg of
+                    SentAjax id_ params reset ->
+                        case id_ of
+                            "test-4" ->
+                                model ! [ SelectTwo.send <| TestAjax params reset ]
+
+                            _ ->
+                                SelectTwo.update (SelectTwo) stmsg model
+
+                    _ ->
+                        SelectTwo.update (SelectTwo) stmsg model
 
 -}
 update : (SelectTwoMsg msg -> msg) -> SelectTwoMsg msg -> Model b msg -> ( Model b msg, Cmd msg )
@@ -236,7 +246,25 @@ selectOption msg ( val, txt ) =
     ( Just (msg val), txt, True )
 
 
-{-| a
+{-| To be used in your ajax functions to set loading state before sending
+
+        TestAjax params reset ->
+            let
+                url =
+                    "//api.github.com/search/repositories"
+
+                buildUrl =
+                    let
+                        term =
+                            if params.term == "" then
+                                "test"
+                            else
+                                params.term
+                    in
+                        (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
+            in
+                SelectTwo.setLoading params reset model ! [ sendAjax buildUrl (TestRes params) ]
+
 -}
 setLoading : AjaxParams -> Bool -> Model b msg -> Model b msg
 setLoading ajaxParams reset model =
@@ -258,7 +286,15 @@ setLoading ajaxParams reset model =
             model
 
 
-{-| a
+{-| Set the list from the return of your ajax command
+
+        TestRes params (Ok str) ->
+            let
+                ( list, newParams ) =
+                    processResult Test str params
+            in
+                SelectTwo.setList list newParams model ! []
+
 -}
 setList : List (GroupSelectTwoOption msg) -> AjaxParams -> Model b msg -> Model b msg
 setList list ajaxParams model =
@@ -279,7 +315,7 @@ setList list ajaxParams model =
         map (\s -> { s | list = newList, ajaxParams = Just { ajaxParams | loading = False } }) model
 
 
-{-| a
+{-| Quick helper way of getting defaults list from a GroupSelectTwoOption list
 -}
 defaultsFromList : List msg -> List (GroupSelectTwoOption msg) -> List (SelectTwoOption msg)
 defaultsFromList defaults list =

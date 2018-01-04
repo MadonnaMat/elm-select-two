@@ -67,10 +67,7 @@ select2Close sender =
                 |> SelectTwo.basicSelectOptions msg
     in
         select2 SelectTwo
-            { defaults =
-                (testList Test)
-                    |> List.concatMap (\( _, l ) -> l)
-                    |> List.filter (\l -> (Just (Test model.test)) == (l |> Tuple4.first))
+            { defaults = SelectTwo.defaultsFromList [ Test model.test ] <| testList Test
             , id_ = "test-1"
             , list = testList Test
             , parents = [ "parent" ]
@@ -80,9 +77,7 @@ select2Close sender =
             , disabled = False
             , showSearch = True
             , multiSelect = False
-            , url = Nothing
-            , data = (\_ -> "")
-            , processResults = (\( _, params ) -> ( [], params ))
+            , ajax = False
             , delay = 0
             }
 
@@ -183,6 +178,7 @@ multiSelectSpan sender id_ defaults list clearMsg disabled placeholder ajax =
 
 
 {-| The dropdown to be shown on the page, this needs to be placed somewhere on the bottome of the view
+The second option can be a custom html builder
 -}
 select2Dropdown : (SelectTwoMsg msg -> msg) -> Maybe (SelectTwoOption msg -> Maybe (Html msg)) -> Model b msg -> Html msg
 select2Dropdown sender customHtml model =

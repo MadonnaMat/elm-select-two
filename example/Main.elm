@@ -122,6 +122,9 @@ update msg model =
             in
                 SelectTwo.setList list newParams model ! []
 
+        Test4Res params (Err _) ->
+            model ! []
+
         Test5Ajax params reset ->
             let
                 url =
@@ -145,6 +148,9 @@ update msg model =
                     processResult Test5 str params
             in
                 SelectTwo.setList list newParams model ! []
+
+        Test5Res params (Err _) ->
+            model ! []
 
 
 sendAjax : String -> (Result Http.Error String -> Msg) -> Cmd Msg

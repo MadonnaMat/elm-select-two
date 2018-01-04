@@ -5,7 +5,7 @@ module SelectTwo.Types exposing (..)
 
 # Types
 
-@docs SelectTwoConfig, SelectTwoMsg, Model,SelectTwo, SelectTwoDropdown, GroupSelectTwoOption, SelectTwoOption, SelectTwoAjaxStuff, AjaxParams, ScrollInfo, AjaxOptions
+@docs SelectTwoConfig, SelectTwoMsg, Model,SelectTwo, SelectTwoDropdown, GroupSelectTwoOption, SelectTwoOption, AjaxParams, ScrollInfo
 
 -}
 
@@ -22,11 +22,10 @@ type SelectTwoMsg msg
     | SelectTwoSelected (Maybe msg)
     | SetSelectTwoSearch String
     | DelayedSelectTwoAjax String
-    | SelectTwoAjax AjaxParams Bool (List (GroupSelectTwoOption msg))
     | STRes (Result Dom.Error ())
     | STMsg msg
     | STNull
-    | SentAjax msg AjaxParams Bool
+    | SentAjax String AjaxParams Bool
     | ResultScroll ScrollInfo
 
 
@@ -50,14 +49,7 @@ type alias SelectTwoConfig msg =
     , disabled : Bool
     , multiSelect : Bool
     , noResultsMessage : Maybe String
-    , ajax : Maybe (AjaxOptions msg)
-    }
-
-
-{-| Ajax Options used in SelectTwoConfig
--}
-type alias AjaxOptions msg =
-    { ajaxId : msg
+    , ajax : Bool
     , delay : Float
     }
 
@@ -92,7 +84,8 @@ type alias SelectTwo msg =
     , search : Maybe String
     , parents : List String
     , list : List (GroupSelectTwoOption msg)
-    , ajax : Maybe (AjaxOptions msg)
+    , ajax : Bool
+    , id_ : String
     , ajaxParams : Maybe AjaxParams
     }
 
@@ -107,15 +100,10 @@ type alias SelectTwoDropdown msg =
     , x : Float
     , y : Float
     , width : Float
-    , ajax : Maybe (AjaxOptions msg)
+    , ajax : Bool
+    , delay : Float
     , noResultsMessage : Maybe String
     }
-
-
-{-| Things needed to make Ajax calls
--}
-type alias SelectTwoAjaxStuff msg =
-    ( String, ( String, AjaxParams ) -> String, ( String, AjaxParams ) -> ( List (GroupSelectTwoOption msg), AjaxParams ), AjaxParams )
 
 
 {-| -}

@@ -18,8 +18,8 @@ filterList filter ( _, text, _ ) =
         |> Maybe.withDefault True
 
 
-location : String -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> List String -> Bool -> Maybe String -> Maybe (AjaxOptions msg) -> JD.Decoder msg
-location id_ sender defaults list parents showSearch noResultsMessage ajax =
+location : String -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> List String -> Bool -> Maybe String -> Bool -> Float -> JD.Decoder msg
+location id_ sender defaults list parents showSearch noResultsMessage ajax delay =
     JD.map2 (,)
         (JD.map2 (,)
             (JD.map2 (+)
@@ -41,6 +41,7 @@ location id_ sender defaults list parents showSearch noResultsMessage ajax =
                 list
                 showSearch
                 ajax
+                delay
                 noResultsMessage
             )
         |> JD.map ((SelectTwoTrigger parents) >> sender)
@@ -66,8 +67,8 @@ parentSize dir oldParents =
                 JD.field "scrollTop" JD.float
 
 
-buildDropdown : String -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Bool -> Maybe (AjaxOptions msg) -> Maybe String -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
-buildDropdown id_ defaults list showSearch ajax noResultsMessage ( ( x, y ), width ) =
+buildDropdown : String -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Bool -> Bool -> Float -> Maybe String -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
+buildDropdown id_ defaults list showSearch ajax delay noResultsMessage ( ( x, y ), width ) =
     { id_ = id_
     , defaults = defaults
     , list = list
@@ -76,6 +77,7 @@ buildDropdown id_ defaults list showSearch ajax noResultsMessage ( ( x, y ), wid
     , y = y
     , width = width
     , ajax = ajax
+    , delay = delay
     , noResultsMessage = noResultsMessage
     }
 

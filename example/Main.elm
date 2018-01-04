@@ -9,6 +9,7 @@ import SelectTwo.Types exposing (..)
 import Task
 import Tuple4
 import Json.Decode as JD
+import Http
 
 
 type alias Model =
@@ -42,13 +43,26 @@ type Msg
     | SelectTwo (SelectTwoMsg Msg)
     | Test3Clear (Maybe Msg)
     | Test5Clear (Maybe Msg)
+    | Test4Ajax AjaxParams Bool
+    | Test4Res AjaxParams (Result Http.Error String)
+    | Test4Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SelectTwo stmsg ->
-            SelectTwo.update stmsg model
+            case stmsg of
+                SentAjax ajaxId params reset ->
+                    case ajaxId of
+                        Test4Msg ->
+                            model ! [ SelectTwo.send <| Test4Ajax params reset ]
+
+                        _ ->
+                            SelectTwo.update (SelectTwo) stmsg model
+
+                _ ->
+                    SelectTwo.update (SelectTwo) stmsg model
 
         Test s ->
             { model | test = s } ! []
@@ -79,6 +93,42 @@ update msg model =
 
         Test5Clear _ ->
             model ! []
+
+        Test4Ajax params reset ->
+            let
+                url =
+                    "//api.github.com/search/repositories"
+
+                buildUrl =
+                    let
+                        term =
+                            if params.term == "" then
+                                "test"
+                            else
+                                params.term
+                    in
+                        (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
+            in
+                SelectTwo.setLoading params reset model ! [ sendAjax buildUrl (Test4Res params) ]
+
+        Test4Res params (Ok str) ->
+            let
+                ( list, newParams ) =
+                    Debug.log "Results" <| processResult Test4 str params
+            in
+                SelectTwo.setList list newParams model ! []
+
+        Test4Res _ (Err _) ->
+            model ! []
+
+        Test4Msg ->
+            model ! []
+
+
+sendAjax : String -> (Result Http.Error String -> Msg) -> Cmd Msg
+sendAjax url msg =
+    Http.getString url
+        |> Http.send msg
 
 
 main : Program Never Model Msg
@@ -126,10 +176,7 @@ view model =
                     , disabled = model.test2 == Just "a"
                     , showSearch = True
                     , multiSelect = False
-                    , url = Nothing
-                    , data = (\_ -> "")
-                    , processResults = (\( _, params ) -> ( [], params ))
-                    , delay = 0
+                    , ajax = Nothing
                     , noResultsMessage = Nothing
                     }
                 ]
@@ -151,10 +198,7 @@ view model =
                     , disabled = False
                     , showSearch = True
                     , multiSelect = False
-                    , url = Nothing
-                    , data = (\_ -> "")
-                    , processResults = (\( _, params ) -> ( [], params ))
-                    , delay = 0
+                    , ajax = Nothing
                     , noResultsMessage = Nothing
                     }
                 ]
@@ -183,10 +227,7 @@ view model =
                     , disabled = model.test2 == Just "a"
                     , showSearch = False
                     , multiSelect = True
-                    , url = Nothing
-                    , data = (\_ -> "")
-                    , processResults = (\( _, params ) -> ( [], params ))
-                    , delay = 0
+                    , ajax = Nothing
                     , noResultsMessage = Nothing
                     }
                 ]
@@ -196,19 +237,11 @@ view model =
             , div []
                 [ select2 SelectTwo
                     { defaults = [ model.test4 |> Maybe.map (\t -> ( Just (Test4 (Just t)), text t.name, t.name, True )) |> Maybe.withDefault ( Nothing, text "", "", True ) ]
-                    , url = Just "//api.github.com/search/repositories"
-                    , data =
-                        (\( url, params ) ->
-                            let
-                                term =
-                                    if params.term == "" then
-                                        "test"
-                                    else
-                                        params.term
-                            in
-                                (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
-                        )
-                    , processResults = processResult Test4
+                    , ajax =
+                        Just
+                            { ajaxId = Test4Msg
+                            , delay = 300
+                            }
                     , id_ = "test-4"
                     , parents = []
                     , clearMsg = Just (\_ -> Test4 Nothing)
@@ -218,49 +251,49 @@ view model =
                     , list = []
                     , multiSelect = False
                     , disabled = model.test2 == Just "a"
-                    , delay = 300
                     , noResultsMessage = Just "YOU GET NOTHING! YOU LOSE GOODDAY SIR!"
                     }
                 ]
             ]
-        , p []
-            [ text "Ajax, Multi Select"
-            , div []
-                [ select2 SelectTwo
-                    { defaults = model.test5 |> List.map (\t -> ( Just (Test5 (Just t)), text t.name, t.name, True ))
-                    , url = Just "//api.github.com/search/repositories"
-                    , data =
-                        (\( url, params ) ->
-                            let
-                                term =
-                                    if params.term == "" then
-                                        "test"
-                                    else
-                                        params.term
-                            in
-                                (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
-                        )
-                    , processResults = processResult Test5
-                    , id_ = "test-5"
-                    , parents = []
-                    , clearMsg = Just Test5Clear
-                    , showSearch = True
-                    , width = "300px"
-                    , placeholder = "Select Test"
-                    , list = []
-                    , multiSelect = True
-                    , disabled = model.test2 == Just "a"
-                    , delay = 300
-                    , noResultsMessage = Nothing
-                    }
-                ]
-            ]
-        , select2Dropdown model
+
+        --, p []
+        --[ text "Ajax, Multi Select"
+        --, div []
+        --[ select2 SelectTwo
+        --{ defaults = model.test5 |> List.map (\t -> ( Just (Test5 (Just t)), text t.name, t.name, True ))
+        --, url = Just "//api.github.com/search/repositories"
+        --, data =
+        --(\( url, params ) ->
+        --let
+        --term =
+        --if params.term == "" then
+        --"test"
+        --else
+        --params.term
+        --in
+        --(url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
+        --)
+        --, processResults = processResult Test5
+        --, id_ = "test-5"
+        --, parents = []
+        --, clearMsg = Just Test5Clear
+        --, showSearch = True
+        --, width = "300px"
+        --, placeholder = "Select Test"
+        --, list = []
+        --, multiSelect = True
+        --, disabled = model.test2 == Just "a"
+        --, delay = 300
+        --, noResultsMessage = Nothing
+        --}
+        --]
+        --]
+        , select2Dropdown SelectTwo model
         ]
 
 
-processResult : (Maybe { id : Int, name : String } -> Msg) -> ( String, AjaxParams ) -> ( List (GroupSelectTwoOption Msg), AjaxParams )
-processResult msg ( string, params ) =
+processResult : (Maybe { id : Int, name : String } -> Msg) -> String -> AjaxParams -> ( List (GroupSelectTwoOption Msg), AjaxParams )
+processResult msg string params =
     (JD.decodeString
         ((JD.map2 (,)
             (JD.at [ "items" ] (JD.list itemsDecoder))

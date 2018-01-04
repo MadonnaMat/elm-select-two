@@ -5,7 +5,7 @@ module SelectTwo.Types exposing (..)
 
 # Types
 
-@docs SelectTwoConfig, SelectTwoMsg, Model,SelectTwo, SelectTwoDropdown, GroupSelectTwoOption, SelectTwoOption, SelectTwoAjaxStuff, AjaxParams, ScrollInfo
+@docs SelectTwoConfig, SelectTwoMsg, Model,SelectTwo, SelectTwoDropdown, GroupSelectTwoOption, SelectTwoOption, SelectTwoAjaxStuff, AjaxParams, ScrollInfo, AjaxOptions
 
 -}
 
@@ -22,10 +22,11 @@ type SelectTwoMsg msg
     | SelectTwoSelected (Maybe msg)
     | SetSelectTwoSearch String
     | DelayedSelectTwoAjax String
-    | SelectTwoAjax (SelectTwoAjaxStuff msg) Bool (Result Http.Error String)
+    | SelectTwoAjax AjaxParams Bool (List (GroupSelectTwoOption msg))
     | STRes (Result Dom.Error ())
     | STMsg msg
     | STNull
+    | SentAjax msg AjaxParams Bool
     | ResultScroll ScrollInfo
 
 
@@ -42,17 +43,22 @@ type alias SelectTwoConfig msg =
     , id_ : String
     , list : List (GroupSelectTwoOption msg)
     , parents : List String
-    , url : Maybe String
-    , data : ( String, AjaxParams ) -> String
-    , processResults : ( String, AjaxParams ) -> ( List (GroupSelectTwoOption msg), AjaxParams )
     , clearMsg : Maybe (Maybe msg -> msg)
     , showSearch : Bool
     , width : String
     , placeholder : String
     , disabled : Bool
     , multiSelect : Bool
-    , delay : Float
     , noResultsMessage : Maybe String
+    , ajax : Maybe (AjaxOptions msg)
+    }
+
+
+{-| Ajax Options used in SelectTwoConfig
+-}
+type alias AjaxOptions msg =
+    { ajaxId : msg
+    , delay : Float
     }
 
 
@@ -86,7 +92,8 @@ type alias SelectTwo msg =
     , search : Maybe String
     , parents : List String
     , list : List (GroupSelectTwoOption msg)
-    , ajaxStuff : Maybe (SelectTwoAjaxStuff msg)
+    , ajax : Maybe (AjaxOptions msg)
+    , ajaxParams : Maybe AjaxParams
     }
 
 
@@ -94,16 +101,13 @@ type alias SelectTwo msg =
 -}
 type alias SelectTwoDropdown msg =
     { id_ : String
-    , sender : SelectTwoMsg msg -> msg
     , defaults : List (SelectTwoOption msg)
     , list : List (GroupSelectTwoOption msg)
     , showSearch : Bool
     , x : Float
     , y : Float
     , width : Float
-    , ajaxStuff : Maybe (SelectTwoAjaxStuff msg)
-    , delay : Float
-    , isAjax : Bool
+    , ajax : Maybe (AjaxOptions msg)
     , noResultsMessage : Maybe String
     }
 

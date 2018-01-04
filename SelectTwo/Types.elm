@@ -81,7 +81,7 @@ type alias GroupSelectTwoOption msg =
 {-| Rows in a select table, first option is the command message to be sent, second is the html to be displayed, and third is the string to search on, and the fourth is if it is disabled or not
 -}
 type alias SelectTwoOption msg =
-    ( Maybe msg, Html msg, String, Bool )
+    ( Maybe msg, String, Bool )
 
 
 {-| Structure created in users model when select2 is activated

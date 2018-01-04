@@ -40,7 +40,7 @@ import SelectTwo.Types
         )
 import SelectTwo.Private exposing (filterGroup, filterList, location, px)
 import Json.Decode as JD
-import Tuple4
+import Tuple3
 
 
 {-| This is a stylesheet link tag to the select2 minified css, use this while developing, but it is more recommended that you use it in your head once
@@ -89,8 +89,8 @@ select2Close sender =
             }
 
 -}
-select2 : (SelectTwoMsg msg -> msg) -> SelectTwoConfig msg -> Html msg
-select2 sender { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, noResultsMessage, ajax } =
+select2 : (SelectTwoMsg msg -> msg) -> Maybe (SelectTwoOption msg -> Maybe (Html msg)) -> SelectTwoConfig msg -> Html msg
+select2 sender customHtml { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, noResultsMessage, ajax } =
     span
         [ classList
             [ ( "select2 elm-select2 select2-container select2-container--default select2-container--below select2-container--focus", True )
@@ -105,22 +105,22 @@ select2 sender { defaults, list, parents, clearMsg, showSearch, width, placehold
         ]
         [ span [ class "selection" ]
             [ if multiSelect then
-                multiSelectSpan sender id_ defaults list clearMsg disabled placeholder ajax
+                multiSelectSpan sender id_ defaults list clearMsg disabled placeholder customHtml ajax
               else
-                singleSelectSpan (defaults |> List.head) clearMsg placeholder
+                singleSelectSpan (defaults |> List.head) clearMsg placeholder customHtml
             ]
         ]
 
 
-singleSelectSpan : Maybe (SelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> String -> Html msg
-singleSelectSpan default clearMsg placeholder =
+singleSelectSpan : Maybe (SelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> String -> Maybe (SelectTwoOption msg -> Maybe (Html msg)) -> Html msg
+singleSelectSpan default clearMsg placeholder customHtml =
     let
-        ( defaultMsg, defaultText, _, _ ) =
-            default |> Maybe.withDefault ( Nothing, text "", "", False )
+        ( defaultMsg, defaultText, _ ) =
+            default |> Maybe.withDefault ( Nothing, "", False )
     in
         span [ class "select2-selection select2-selection--single" ]
             [ span [ class "select2-selection__rendered" ]
-                [ if defaultText == text "" then
+                [ if defaultText == "" then
                     span [ class "select2-selection__placeholder" ] [ text placeholder ]
                   else
                     case clearMsg of
@@ -129,14 +129,14 @@ singleSelectSpan default clearMsg placeholder =
 
                         Nothing ->
                             text ""
-                , defaultText
+                , runCustomHtml customHtml <| Maybe.withDefault ( Nothing, "", False ) default
                 ]
             , span [ class "select2-selection__arrow" ] [ b [] [] ]
             ]
 
 
-multiSelectSpan : (SelectTwoMsg msg -> msg) -> String -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> Bool -> String -> Maybe (AjaxOptions msg) -> Html msg
-multiSelectSpan sender id_ defaults list clearMsg disabled placeholder ajax =
+multiSelectSpan : (SelectTwoMsg msg -> msg) -> String -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> Bool -> String -> Maybe (SelectTwoOption msg -> Maybe (Html msg)) -> Maybe (AjaxOptions msg) -> Html msg
+multiSelectSpan sender id_ defaults list clearMsg disabled placeholder customHtml ajax =
     let
         theList =
             case ajax of
@@ -152,7 +152,7 @@ multiSelectSpan sender id_ defaults list clearMsg disabled placeholder ajax =
                     |> List.concatMap Tuple.second
                     |> List.filter (flip List.member defaults)
                     |> List.map
-                        (\( msg, txt, _, _ ) ->
+                        (\( msg, txt, sel ) ->
                             li [ class "select2-selection__choice" ]
                                 [ case clearMsg of
                                     Just clrMsg ->
@@ -160,7 +160,7 @@ multiSelectSpan sender id_ defaults list clearMsg disabled placeholder ajax =
 
                                     Nothing ->
                                         text ""
-                                , txt
+                                , text txt
                                 ]
                         )
                  )
@@ -188,23 +188,23 @@ multiSelectSpan sender id_ defaults list clearMsg disabled placeholder ajax =
 
 {-| The dropdown to be shown on the page, this needs to be placed somewhere on the bottome of the view
 -}
-select2Dropdown : (SelectTwoMsg msg -> msg) -> Model b msg -> Html msg
-select2Dropdown sender model =
+select2Dropdown : (SelectTwoMsg msg -> msg) -> Maybe (SelectTwoOption msg -> Maybe (Html msg)) -> Model b msg -> Html msg
+select2Dropdown sender customHtml model =
     case model.selectTwo of
         Just { dropdown, hovered, search, list, ajaxParams } ->
-            select2DropdownDraw sender dropdown hovered search list ajaxParams
+            select2DropdownDraw sender dropdown hovered search list ajaxParams customHtml
 
         Nothing ->
             text ""
 
 
-select2DropdownDraw : (SelectTwoMsg msg -> msg) -> SelectTwoDropdown msg -> Maybe msg -> Maybe String -> List (GroupSelectTwoOption msg) -> Maybe AjaxParams -> Html msg
-select2DropdownDraw sender { id_, defaults, list, showSearch, x, y, width, ajax, noResultsMessage } hovered search ajaxList ajaxParams =
+select2DropdownDraw : (SelectTwoMsg msg -> msg) -> SelectTwoDropdown msg -> Maybe msg -> Maybe String -> List (GroupSelectTwoOption msg) -> Maybe AjaxParams -> Maybe (SelectTwoOption msg -> Maybe (Html msg)) -> Html msg
+select2DropdownDraw sender { id_, defaults, list, showSearch, x, y, width, ajax, noResultsMessage } hovered search ajaxList ajaxParams customHtml =
     let
         theList =
             if ajax /= Nothing then
                 if (Maybe.map (\{ loading } -> loading) ajaxParams |> Maybe.withDefault False) && List.isEmpty ajaxList then
-                    [ ( "", [ ( Nothing, text "Searching", "", False ) ] ) ]
+                    [ ( "", [ ( Nothing, "Searching", False ) ] ) ]
                 else
                     ajaxList
             else
@@ -237,7 +237,7 @@ select2DropdownDraw sender { id_, defaults, list, showSearch, x, y, width, ajax,
                         (if ajax /= Nothing && (theList == [ ( "", [] ) ] || List.isEmpty theList) then
                             [ noResultsFound noResultsMessage ]
                          else
-                            listOrGroup sender defaults theList hovered search
+                            listOrGroup sender defaults theList hovered search customHtml
                         )
                     ]
                 ]
@@ -255,43 +255,43 @@ scrollPosition wrapper =
         |> JD.map wrapper
 
 
-listOrGroup : (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Maybe msg -> Maybe String -> List (Html msg)
-listOrGroup sender defaults list hovered search =
+listOrGroup : (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Maybe msg -> Maybe String -> Maybe (SelectTwoOption msg -> Maybe (Html msg)) -> List (Html msg)
+listOrGroup sender defaults list hovered search customHtml =
     if List.length list == 1 && (list |> List.head |> Maybe.map (Tuple.first) |> Maybe.withDefault "") == "" then
         list
             |> List.head
             |> Maybe.map (Tuple.second)
             |> Maybe.map (List.filter (filterList search))
             |> Maybe.map (List.Extra.uniqueBy selectTwoUniq)
-            |> Maybe.map (List.map (select2ListItem sender defaults hovered))
+            |> Maybe.map (List.map (select2ListItem sender defaults hovered customHtml))
             |> Maybe.withDefault []
     else
         list
             |> List.map (filterGroup search)
-            |> List.map (select2ListGroup sender defaults hovered)
+            |> List.map (select2ListGroup sender defaults hovered customHtml)
 
 
-selectTwoUniq : SelectTwoOption msg -> ( String, String, String, String )
-selectTwoUniq ( a, b, c, d ) =
-    ( toString a, toString b, c, toString d )
+selectTwoUniq : SelectTwoOption msg -> ( String, String, String )
+selectTwoUniq ( a, c, d ) =
+    ( toString a, c, toString d )
 
 
-select2ListGroup : (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> Maybe msg -> GroupSelectTwoOption msg -> Html msg
-select2ListGroup sender defaults hovered ( label, list ) =
+select2ListGroup : (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> Maybe msg -> Maybe (SelectTwoOption msg -> Maybe (Html msg)) -> GroupSelectTwoOption msg -> Html msg
+select2ListGroup sender defaults hovered customHtml ( label, list ) =
     li [ class "select2-results__option" ]
         [ strong [ class "select2-results__group" ] [ text label ]
         , ul [ class "select2-results__options select2-results__options--nested" ]
             (list
                 |> List.Extra.uniqueBy selectTwoUniq
-                |> List.map (select2ListItem sender defaults hovered)
+                |> List.map (select2ListItem sender defaults hovered customHtml)
             )
         ]
 
 
-select2ListItem : (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> Maybe msg -> SelectTwoOption msg -> Html msg
-select2ListItem sender defaults hovered option =
+select2ListItem : (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> Maybe msg -> Maybe (SelectTwoOption msg -> Maybe (Html msg)) -> SelectTwoOption msg -> Html msg
+select2ListItem sender defaults hovered customHtml option =
     let
-        ( msg, display, _, enabled ) =
+        ( msg, display, enabled ) =
             option
     in
         li
@@ -311,7 +311,7 @@ select2ListItem sender defaults hovered option =
                     ]
                 ]
             )
-            [ display ]
+            [ runCustomHtml customHtml option ]
 
 
 noResultsFound : Maybe String -> Html msg
@@ -355,7 +355,7 @@ widthGuess : Float -> List (GroupSelectTwoOption msg) -> String
 widthGuess font list =
     list
         |> List.concatMap Tuple.second
-        |> List.map Tuple4.third
+        |> List.map Tuple3.second
         |> List.map (String.length)
         |> List.maximum
         |> Maybe.withDefault 0
@@ -363,3 +363,8 @@ widthGuess font list =
         |> (*) (font / 1.5)
         |> (+) 30
         |> px
+
+
+runCustomHtml : Maybe (SelectTwoOption msg -> Maybe (Html msg)) -> SelectTwoOption msg -> Html msg
+runCustomHtml customHtml option =
+    customHtml |> Maybe.andThen (\ch -> ch option) |> Maybe.withDefault (text (option |> Tuple3.second))

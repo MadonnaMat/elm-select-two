@@ -243,7 +243,7 @@ selectGroup msg list =
 
 selectOption : (a -> msg) -> ( a, String ) -> SelectTwoOption msg
 selectOption msg ( val, txt ) =
-    ( Just (msg val), text txt, txt, True )
+    ( Just (msg val), txt, True )
 
 
 {-| a

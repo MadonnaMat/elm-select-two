@@ -12,7 +12,7 @@ filterGroup filter list =
 
 
 filterList : Maybe String -> SelectTwoOption a -> Bool
-filterList filter ( _, _, text, _ ) =
+filterList filter ( _, text, _ ) =
     filter
         |> Maybe.andThen ((String.toLower) >> (flip String.contains (text |> String.toLower)) >> Just)
         |> Maybe.withDefault True

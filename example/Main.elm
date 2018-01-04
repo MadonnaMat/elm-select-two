@@ -7,7 +7,7 @@ import SelectTwo exposing (..)
 import SelectTwo.Html exposing (..)
 import SelectTwo.Types exposing (..)
 import Task
-import Tuple4
+import Tuple3
 import Json.Decode as JD
 import Http
 
@@ -163,10 +163,11 @@ view model =
             [ text "Single Group, Single Select, Width Guess'd"
             , div []
                 [ select2 SelectTwo
+                    Nothing
                     { defaults =
                         (testList Test)
                             |> List.concatMap (\( _, l ) -> l)
-                            |> List.filter (\l -> (Just (Test model.test)) == (l |> Tuple4.first))
+                            |> List.filter (\l -> (Just (Test model.test)) == (l |> Tuple3.first))
                     , id_ = "test-1"
                     , list = testList Test
                     , parents = []
@@ -185,10 +186,11 @@ view model =
             [ text "Multiple Groups, Single Select, Relative Parent"
             , div []
                 [ select2 SelectTwo
+                    Nothing
                     { defaults =
                         (testList2 Test2)
                             |> List.concatMap (\( _, l ) -> l)
-                            |> List.filter (\l -> (Just (Test2 model.test2)) == (l |> Tuple4.first))
+                            |> List.filter (\l -> (Just (Test2 model.test2)) == (l |> Tuple3.first))
                     , id_ = "test-2"
                     , list = testList2 Test2
                     , parents = [ "p1" ]
@@ -214,10 +216,11 @@ view model =
             [ text "Single Group, Multi-Select, Custom Rows, Position Absolute"
             , div []
                 [ select2 SelectTwo
+                    (Just customHtml)
                     { defaults =
                         (testList3 Test3)
                             |> List.concatMap (\( _, l ) -> l)
-                            |> List.filter (\l -> model.test3 |> List.map (Test3 >> Just) |> List.member (l |> Tuple4.first))
+                            |> List.filter (\l -> model.test3 |> List.map (Test3 >> Just) |> List.member (l |> Tuple3.first))
                     , id_ = "test-3"
                     , list = testList3 Test3
                     , parents = [ "p2" ]
@@ -236,7 +239,8 @@ view model =
             [ text "Ajax, Single Select"
             , div []
                 [ select2 SelectTwo
-                    { defaults = [ model.test4 |> Maybe.map (\t -> ( Just (Test4 (Just t)), text t.name, t.name, True )) |> Maybe.withDefault ( Nothing, text "", "", True ) ]
+                    Nothing
+                    { defaults = [ model.test4 |> Maybe.map (\t -> ( Just (Test4 (Just t)), t.name, True )) |> Maybe.withDefault ( Nothing, "", True ) ]
                     , ajax =
                         Just
                             { ajaxId = Test4Msg
@@ -288,7 +292,7 @@ view model =
         --}
         --]
         --]
-        , select2Dropdown SelectTwo model
+        , select2Dropdown SelectTwo (Just customHtml) model
         ]
 
 
@@ -351,18 +355,28 @@ testList3 msg =
         |> List.map
             (\( a, b ) ->
                 ( Just (msg a)
-                , span
-                    [ style
-                        [ ( "width", "100%" )
-                        , ( "text-align", "center" )
-                        , ( "display", "inline-block" )
-                        ]
-                    ]
-                    [ text b
-                    ]
                 , b
                 , True
                 )
             )
     )
         :: []
+
+
+customHtml : SelectTwoOption Msg -> Maybe (Html Msg)
+customHtml ( msg, txt, sel ) =
+    case msg of
+        Just (Test3 _) ->
+            Just <|
+                span
+                    [ style
+                        [ ( "width", "100%" )
+                        , ( "text-align", "center" )
+                        , ( "display", "inline-block" )
+                        ]
+                    ]
+                    [ text txt
+                    ]
+
+        _ ->
+            Nothing

@@ -11059,9 +11059,7 @@ var _MadonnaMat$elm_select_two$SelectTwo$defaultsFromList = F2(
 					false,
 					A2(
 						_elm_lang$core$Maybe$map,
-						function (a) {
-							return A2(_elm_lang$core$List$member, a, defaults);
-						},
+						A2(_elm_lang$core$Basics$flip, _elm_lang$core$List$member, defaults),
 						_Fresheyeball$elm_tuple_extra$Tuple3$first(l)));
 			},
 			A2(

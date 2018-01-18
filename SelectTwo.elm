@@ -191,7 +191,16 @@ setSearch filter =
         map (\s -> { s | search = search })
 
 
-{-| a
+{-| Quick helper method for sending a message and running through your update function agian
+
+    update msg model =
+        case msg of
+            Test1 ->
+                model ! [ SelectTwo.send Test2 ]
+
+            Test2 ->
+                model ! []
+
 -}
 send : msg -> Cmd msg
 send msg =
@@ -325,6 +334,6 @@ defaultsFromList defaults list =
             (\l ->
                 l
                     |> Tuple3.first
-                    |> Maybe.map (\a -> List.member a defaults)
+                    |> Maybe.map (flip List.member defaults)
                     |> Maybe.withDefault False
             )

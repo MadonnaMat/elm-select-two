@@ -18,7 +18,7 @@ module SelectTwo exposing (update, new, map, setSearch, basicSelectOptions, basi
 -}
 
 import SelectTwo.Types exposing (SelectTwoMsg(..), SelectTwo, SelectTwoDropdown, SelectTwoOption, AjaxParams, GroupSelectTwoOption, Model)
-import SelectTwo.Private exposing (filterList, filterGroup, px, asTuple, defaultParams)
+import SelectTwo.Private exposing (filterList, filterGroup, px, asTuple, defaultParams, uncurry3)
 import Json.Decode as JD
 import List.Extra
 import Task
@@ -34,23 +34,23 @@ import Html exposing (text)
 
     yourUpdate : Msg -> Model -> ( Model, Cmd Msg )
     yourUpdate msg model =
-        case msg of
-            SelectTwo stmsg ->
-                case stmsg of
-                    SentAjax id_ params reset ->
+        let
+            ajaxSend =
+                Just
+                    (\id_ params reset ->
                         case id_ of
                             "test-4" ->
                                 model ! [ SelectTwo.send <| TestAjax params reset ]
 
                             _ ->
-                                SelectTwo.update (SelectTwo) stmsg model
-
-                    _ ->
-                        SelectTwo.update (SelectTwo) stmsg model
+                                model ! []
+                    )
+        in
+            SelectTwo.update (SelectTwo) stmsg ajaxSend model
 
 -}
-update : (SelectTwoMsg msg -> msg) -> SelectTwoMsg msg -> Model b msg -> ( Model b msg, Cmd msg )
-update sender msg model =
+update : (SelectTwoMsg msg -> msg) -> SelectTwoMsg msg -> Maybe (String -> AjaxParams -> Bool -> ( Model b msg, Cmd msg )) -> Model b msg -> ( Model b msg, Cmd msg )
+update sender msg maybeAjax model =
     case msg of
         SelectTwoTrigger p dd ->
             let
@@ -100,8 +100,10 @@ update sender msg model =
         STNull ->
             model ! []
 
-        SentAjax _ _ _ ->
-            model ! []
+        SentAjax id_ params reset ->
+            maybeAjax
+                |> Maybe.map (flip uncurry3 ( id_, params, reset ))
+                |> Maybe.withDefault ( model, Cmd.none )
 
 
 checkScrollPage : Int -> Int -> (SelectTwoMsg msg -> msg) -> Model b msg -> ( Model b msg, Cmd msg )

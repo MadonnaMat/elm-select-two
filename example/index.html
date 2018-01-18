@@ -10821,6 +10821,11 @@ var _elm_community$list_extra$List_Extra$init = function () {
 }();
 var _elm_community$list_extra$List_Extra$last = _elm_community$list_extra$List_Extra$foldl1(
 	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
+var _MadonnaMat$elm_select_two$SelectTwo_Private$uncurry3 = F2(
+	function (f, _p0) {
+		var _p1 = _p0;
+		return A3(f, _p1._0, _p1._1, _p1._2);
+	});
 var _MadonnaMat$elm_select_two$SelectTwo_Private$defaultParams = function (filter) {
 	return {page: 1, term: filter, more: false, loading: true};
 };
@@ -10846,26 +10851,26 @@ var _MadonnaMat$elm_select_two$SelectTwo_Private$className = A2(
 var _MadonnaMat$elm_select_two$SelectTwo_Private$hasClass = function ($class) {
 	return A2(
 		_MadonnaMat$elm_select_two$SelectTwo_Private$decodeIf,
-		function (_p0) {
+		function (_p2) {
 			return A2(
 				_elm_lang$core$Maybe$withDefault,
 				false,
 				A2(
 					_elm_lang$core$Maybe$map,
-					function (_p1) {
+					function (_p3) {
 						return A2(
 							_elm_lang$core$List$member,
 							$class,
-							A2(_elm_lang$core$String$split, ' ', _p1));
+							A2(_elm_lang$core$String$split, ' ', _p3));
 					},
-					_p0));
+					_p2));
 		},
 		_MadonnaMat$elm_select_two$SelectTwo_Private$className);
 };
 var _MadonnaMat$elm_select_two$SelectTwo_Private$closest = F2(
 	function ($class, decoder) {
-		var body = function (_p2) {
-			var _p3 = _p2;
+		var body = function (_p4) {
+			var _p5 = _p4;
 			return _elm_lang$core$Json_Decode$oneOf(
 				{
 					ctor: '::',
@@ -10882,7 +10887,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Private$closest = F2(
 		};
 		return _elm_lang$core$Json_Decode$lazy(body);
 	});
-var _MadonnaMat$elm_select_two$SelectTwo_Private$px = function (_p4) {
+var _MadonnaMat$elm_select_two$SelectTwo_Private$px = function (_p6) {
 	return A3(
 		_elm_lang$core$Basics$flip,
 		F2(
@@ -10890,49 +10895,49 @@ var _MadonnaMat$elm_select_two$SelectTwo_Private$px = function (_p4) {
 				return A2(_elm_lang$core$Basics_ops['++'], x, y);
 			}),
 		'px',
-		_elm_lang$core$Basics$toString(_p4));
+		_elm_lang$core$Basics$toString(_p6));
 };
 var _MadonnaMat$elm_select_two$SelectTwo_Private$buildDropdown = F8(
-	function (id_, defaults, list, showSearch, ajax, delay, noResultsMessage, _p5) {
-		var _p6 = _p5;
-		return {id_: id_, defaults: defaults, list: list, showSearch: showSearch, x: _p6._0._0, y: _p6._0._1, width: _p6._1, ajax: ajax, delay: delay, noResultsMessage: noResultsMessage};
+	function (id_, defaults, list, showSearch, ajax, delay, noResultsMessage, _p7) {
+		var _p8 = _p7;
+		return {id_: id_, defaults: defaults, list: list, showSearch: showSearch, x: _p8._0._0, y: _p8._0._1, width: _p8._1, ajax: ajax, delay: delay, noResultsMessage: noResultsMessage};
 	});
 var _MadonnaMat$elm_select_two$SelectTwo_Private$parentSize = F2(
 	function (dir, oldParents) {
 		var uncons = _elm_community$list_extra$List_Extra$uncons(oldParents);
-		var _p7 = uncons;
-		if (_p7.ctor === 'Just') {
-			var _p10 = _p7._0._0;
+		var _p9 = uncons;
+		if (_p9.ctor === 'Just') {
+			var _p12 = _p9._0._0;
 			return A3(
 				_elm_lang$core$Json_Decode$map2,
 				F2(
 					function (x, y) {
 						return x + y;
 					}),
-				A2(_MadonnaMat$elm_select_two$SelectTwo_Private$parentSize, dir, _p7._0._1),
+				A2(_MadonnaMat$elm_select_two$SelectTwo_Private$parentSize, dir, _p9._0._1),
 				A3(
 					_elm_lang$core$Json_Decode$map2,
 					F2(
 						function (x, y) {
 							return x - y;
 						}),
-					function (_p8) {
+					function (_p10) {
 						return A2(
 							_MadonnaMat$elm_select_two$SelectTwo_Private$closest,
-							_p10,
+							_p12,
 							A2(
 								_elm_lang$core$Json_Decode$field,
 								A2(_elm_lang$core$Basics_ops['++'], 'offset', dir),
-								_p8));
+								_p10));
 					}(_elm_lang$core$Json_Decode$float),
-					function (_p9) {
+					function (_p11) {
 						return A2(
 							_MadonnaMat$elm_select_two$SelectTwo_Private$closest,
-							_p10,
+							_p12,
 							A2(
 								_elm_lang$core$Json_Decode$field,
 								A2(_elm_lang$core$Basics_ops['++'], 'scroll', dir),
-								_p9));
+								_p11));
 					}(_elm_lang$core$Json_Decode$float)));
 		} else {
 			return A2(_elm_lang$core$Json_Decode$field, 'scrollTop', _elm_lang$core$Json_Decode$float);
@@ -10940,17 +10945,17 @@ var _MadonnaMat$elm_select_two$SelectTwo_Private$parentSize = F2(
 	});
 var _MadonnaMat$elm_select_two$SelectTwo_Private$location = F9(
 	function (id_, sender, defaults, list, parents, showSearch, noResultsMessage, ajax, delay) {
-		return function (_p11) {
+		return function (_p13) {
 			return A2(
 				_elm_lang$core$Json_Decode$field,
 				'target',
-				A2(_MadonnaMat$elm_select_two$SelectTwo_Private$closest, 'select2', _p11));
+				A2(_MadonnaMat$elm_select_two$SelectTwo_Private$closest, 'select2', _p13));
 		}(
 			A2(
 				_elm_lang$core$Json_Decode$map,
-				function (_p12) {
+				function (_p14) {
 					return sender(
-						A2(_MadonnaMat$elm_select_two$SelectTwo_Types$SelectTwoTrigger, parents, _p12));
+						A2(_MadonnaMat$elm_select_two$SelectTwo_Types$SelectTwoTrigger, parents, _p14));
 				},
 				A2(
 					_elm_lang$core$Json_Decode$map,
@@ -11021,20 +11026,20 @@ var _MadonnaMat$elm_select_two$SelectTwo_Private$location = F9(
 							_elm_lang$core$Json_Decode$float)))));
 	});
 var _MadonnaMat$elm_select_two$SelectTwo_Private$filterList = F2(
-	function (filter, _p13) {
-		var _p14 = _p13;
+	function (filter, _p15) {
+		var _p16 = _p15;
 		return A2(
 			_elm_lang$core$Maybe$withDefault,
 			true,
 			A2(
 				_elm_lang$core$Maybe$andThen,
-				function (_p15) {
+				function (_p17) {
 					return _elm_lang$core$Maybe$Just(
 						A3(
 							_elm_lang$core$Basics$flip,
 							_elm_lang$core$String$contains,
-							_elm_lang$core$String$toLower(_p14._1),
-							_elm_lang$core$String$toLower(_p15)));
+							_elm_lang$core$String$toLower(_p16._1),
+							_elm_lang$core$String$toLower(_p17)));
 				},
 				filter));
 	});
@@ -11346,8 +11351,8 @@ var _MadonnaMat$elm_select_two$SelectTwo$checkScrollPage = F4(
 					},
 					model.selectTwo)));
 	});
-var _MadonnaMat$elm_select_two$SelectTwo$update = F3(
-	function (sender, msg, model) {
+var _MadonnaMat$elm_select_two$SelectTwo$update = F4(
+	function (sender, msg, maybeAjax, model) {
 		var _p12 = msg;
 		switch (_p12.ctor) {
 			case 'SelectTwoTrigger':
@@ -11512,9 +11517,15 @@ var _MadonnaMat$elm_select_two$SelectTwo$update = F3(
 					{ctor: '[]'});
 			default:
 				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					model,
-					{ctor: '[]'});
+					_elm_lang$core$Maybe$withDefault,
+					{ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none},
+					A2(
+						_elm_lang$core$Maybe$map,
+						A2(
+							_elm_lang$core$Basics$flip,
+							_MadonnaMat$elm_select_two$SelectTwo_Private$uncurry3,
+							{ctor: '_Tuple3', _0: _p12._0, _1: _p12._1, _2: _p12._2}),
+						maybeAjax));
 		}
 	});
 var _MadonnaMat$elm_select_two$SelectTwo_Html$runCustomHtml = F2(
@@ -12590,39 +12601,39 @@ var _MadonnaMat$elm_select_two$Main$update = F2(
 		var _p7 = msg;
 		switch (_p7.ctor) {
 			case 'SelectTwo':
-				var _p12 = _p7._0;
-				var _p8 = _p12;
-				if (_p8.ctor === 'SentAjax') {
-					var _p11 = _p8._2;
-					var _p10 = _p8._1;
-					var _p9 = _p8._0;
-					switch (_p9) {
-						case 'test-4':
-							return A2(
-								_elm_lang$core$Platform_Cmd_ops['!'],
-								model,
-								{
-									ctor: '::',
-									_0: _MadonnaMat$elm_select_two$SelectTwo$send(
-										A2(_MadonnaMat$elm_select_two$Main$Test4Ajax, _p10, _p11)),
-									_1: {ctor: '[]'}
-								});
-						case 'test-5':
-							return A2(
-								_elm_lang$core$Platform_Cmd_ops['!'],
-								model,
-								{
-									ctor: '::',
-									_0: _MadonnaMat$elm_select_two$SelectTwo$send(
-										A2(_MadonnaMat$elm_select_two$Main$Test5Ajax, _p10, _p11)),
-									_1: {ctor: '[]'}
-								});
-						default:
-							return A3(_MadonnaMat$elm_select_two$SelectTwo$update, _MadonnaMat$elm_select_two$Main$SelectTwo, _p12, model);
-					}
-				} else {
-					return A3(_MadonnaMat$elm_select_two$SelectTwo$update, _MadonnaMat$elm_select_two$Main$SelectTwo, _p12, model);
-				}
+				var ajaxCases = _elm_lang$core$Maybe$Just(
+					F3(
+						function (id_, params, reset) {
+							var _p8 = id_;
+							switch (_p8) {
+								case 'test-4':
+									return A2(
+										_elm_lang$core$Platform_Cmd_ops['!'],
+										model,
+										{
+											ctor: '::',
+											_0: _MadonnaMat$elm_select_two$SelectTwo$send(
+												A2(_MadonnaMat$elm_select_two$Main$Test4Ajax, params, reset)),
+											_1: {ctor: '[]'}
+										});
+								case 'test-5':
+									return A2(
+										_elm_lang$core$Platform_Cmd_ops['!'],
+										model,
+										{
+											ctor: '::',
+											_0: _MadonnaMat$elm_select_two$SelectTwo$send(
+												A2(_MadonnaMat$elm_select_two$Main$Test5Ajax, params, reset)),
+											_1: {ctor: '[]'}
+										});
+								default:
+									return A2(
+										_elm_lang$core$Platform_Cmd_ops['!'],
+										model,
+										{ctor: '[]'});
+							}
+						}));
+				return A4(_MadonnaMat$elm_select_two$SelectTwo$update, _MadonnaMat$elm_select_two$Main$SelectTwo, _p7._0, ajaxCases, model);
 			case 'Test':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
@@ -12714,10 +12725,10 @@ var _MadonnaMat$elm_select_two$Main$update = F2(
 						{ctor: '[]'});
 				}
 			case 'Test4Ajax':
-				var _p13 = _p7._0;
+				var _p9 = _p7._0;
 				var url = '//api.github.com/search/repositories';
 				var buildUrl = function () {
-					var term = _elm_lang$core$Native_Utils.eq(_p13.term, '') ? 'test' : _p13.term;
+					var term = _elm_lang$core$Native_Utils.eq(_p9.term, '') ? 'test' : _p9.term;
 					return A2(
 						_elm_lang$core$Basics_ops['++'],
 						url,
@@ -12730,24 +12741,24 @@ var _MadonnaMat$elm_select_two$Main$update = F2(
 								A2(
 									_elm_lang$core$Basics_ops['++'],
 									'&page=',
-									_elm_lang$core$Basics$toString(_p13.page)))));
+									_elm_lang$core$Basics$toString(_p9.page)))));
 				}();
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
-					A3(_MadonnaMat$elm_select_two$SelectTwo$setLoading, _p13, _p7._1, model),
+					A3(_MadonnaMat$elm_select_two$SelectTwo$setLoading, _p9, _p7._1, model),
 					{
 						ctor: '::',
 						_0: A2(
 							_MadonnaMat$elm_select_two$Main$sendAjax,
 							buildUrl,
-							_MadonnaMat$elm_select_two$Main$Test4Res(_p13)),
+							_MadonnaMat$elm_select_two$Main$Test4Res(_p9)),
 						_1: {ctor: '[]'}
 					});
 			case 'Test4Res':
 				if (_p7._1.ctor === 'Ok') {
-					var _p14 = A3(_MadonnaMat$elm_select_two$Main$processResult, _MadonnaMat$elm_select_two$Main$Test4, _p7._1._0, _p7._0);
-					var list = _p14._0;
-					var newParams = _p14._1;
+					var _p10 = A3(_MadonnaMat$elm_select_two$Main$processResult, _MadonnaMat$elm_select_two$Main$Test4, _p7._1._0, _p7._0);
+					var list = _p10._0;
+					var newParams = _p10._1;
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						A3(_MadonnaMat$elm_select_two$SelectTwo$setList, list, newParams, model),
@@ -12759,10 +12770,10 @@ var _MadonnaMat$elm_select_two$Main$update = F2(
 						{ctor: '[]'});
 				}
 			case 'Test5Ajax':
-				var _p15 = _p7._0;
+				var _p11 = _p7._0;
 				var url = '//api.github.com/search/repositories';
 				var buildUrl = function () {
-					var term = _elm_lang$core$Native_Utils.eq(_p15.term, '') ? 'test' : _p15.term;
+					var term = _elm_lang$core$Native_Utils.eq(_p11.term, '') ? 'test' : _p11.term;
 					return A2(
 						_elm_lang$core$Basics_ops['++'],
 						url,
@@ -12775,24 +12786,24 @@ var _MadonnaMat$elm_select_two$Main$update = F2(
 								A2(
 									_elm_lang$core$Basics_ops['++'],
 									'&page=',
-									_elm_lang$core$Basics$toString(_p15.page)))));
+									_elm_lang$core$Basics$toString(_p11.page)))));
 				}();
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
-					A3(_MadonnaMat$elm_select_two$SelectTwo$setLoading, _p15, _p7._1, model),
+					A3(_MadonnaMat$elm_select_two$SelectTwo$setLoading, _p11, _p7._1, model),
 					{
 						ctor: '::',
 						_0: A2(
 							_MadonnaMat$elm_select_two$Main$sendAjax,
 							buildUrl,
-							_MadonnaMat$elm_select_two$Main$Test5Res(_p15)),
+							_MadonnaMat$elm_select_two$Main$Test5Res(_p11)),
 						_1: {ctor: '[]'}
 					});
 			default:
 				if (_p7._1.ctor === 'Ok') {
-					var _p16 = A3(_MadonnaMat$elm_select_two$Main$processResult, _MadonnaMat$elm_select_two$Main$Test5, _p7._1._0, _p7._0);
-					var list = _p16._0;
-					var newParams = _p16._1;
+					var _p12 = A3(_MadonnaMat$elm_select_two$Main$processResult, _MadonnaMat$elm_select_two$Main$Test5, _p7._1._0, _p7._0);
+					var list = _p12._0;
+					var newParams = _p12._1;
 					return A2(
 						_elm_lang$core$Platform_Cmd_ops['!'],
 						A3(_MadonnaMat$elm_select_two$SelectTwo$setList, list, newParams, model),
@@ -12887,7 +12898,7 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 												list: _MadonnaMat$elm_select_two$Main$testList(_MadonnaMat$elm_select_two$Main$Test),
 												parents: {ctor: '[]'},
 												clearMsg: _elm_lang$core$Maybe$Just(
-													function (_p17) {
+													function (_p13) {
 														return _MadonnaMat$elm_select_two$Main$Test(_elm_lang$core$Maybe$Nothing);
 													}),
 												width: A2(
@@ -12957,7 +12968,7 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 														_1: {ctor: '[]'}
 													},
 													clearMsg: _elm_lang$core$Maybe$Just(
-														function (_p18) {
+														function (_p14) {
 															return _MadonnaMat$elm_select_two$Main$Test2(_elm_lang$core$Maybe$Nothing);
 														}),
 													width: '300px',
@@ -13086,7 +13097,7 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 															id_: 'test-4',
 															parents: {ctor: '[]'},
 															clearMsg: _elm_lang$core$Maybe$Just(
-																function (_p19) {
+																function (_p15) {
 																	return _MadonnaMat$elm_select_two$Main$Test4(_elm_lang$core$Maybe$Nothing);
 																}),
 															showSearch: true,

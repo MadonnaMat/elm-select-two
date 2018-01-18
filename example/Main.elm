@@ -53,20 +53,22 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SelectTwo stmsg ->
-            case stmsg of
-                SentAjax id_ params reset ->
-                    case id_ of
-                        "test-4" ->
-                            model ! [ SelectTwo.send <| Test4Ajax params reset ]
+            let
+                ajaxCases =
+                    Just
+                        (\id_ params reset ->
+                            case id_ of
+                                "test-4" ->
+                                    model ! [ SelectTwo.send <| Test4Ajax params reset ]
 
-                        "test-5" ->
-                            model ! [ SelectTwo.send <| Test5Ajax params reset ]
+                                "test-5" ->
+                                    model ! [ SelectTwo.send <| Test5Ajax params reset ]
 
-                        _ ->
-                            SelectTwo.update (SelectTwo) stmsg model
-
-                _ ->
-                    SelectTwo.update (SelectTwo) stmsg model
+                                _ ->
+                                    model ! []
+                        )
+            in
+                SelectTwo.update (SelectTwo) stmsg ajaxCases model
 
         Test s ->
             { model | test = s } ! []

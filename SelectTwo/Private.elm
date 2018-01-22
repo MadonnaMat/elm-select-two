@@ -12,14 +12,14 @@ filterGroup filter list =
 
 
 filterList : Maybe String -> SelectTwoOption a -> Bool
-filterList filter ( _, _, text, _ ) =
+filterList filter ( _, text, _ ) =
     filter
         |> Maybe.andThen ((String.toLower) >> (flip String.contains (text |> String.toLower)) >> Just)
         |> Maybe.withDefault True
 
 
-location : String -> Float -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> List String -> Bool -> Maybe String -> JD.Decoder msg
-location id_ delay sender defaults list parents showSearch noResultsMessage =
+location : String -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> List String -> Bool -> Maybe String -> Bool -> Float -> JD.Decoder msg
+location id_ sender defaults list parents showSearch noResultsMessage ajax delay =
     JD.map2 (,)
         (JD.map2 (,)
             (JD.map2 (+)
@@ -37,56 +37,11 @@ location id_ delay sender defaults list parents showSearch noResultsMessage =
         (JD.at [ "offsetWidth" ] JD.float)
         |> JD.map
             (buildDropdown id_
-                delay
-                sender
                 defaults
                 list
                 showSearch
-                Nothing
-                False
-                noResultsMessage
-            )
-        |> JD.map ((SelectTwoTrigger parents) >> sender)
-        |> (JD.field "target" << closest "select2")
-
-
-ajaxLocation :
-    String
-    -> Float
-    -> (SelectTwoMsg msg -> msg)
-    -> List (SelectTwoOption msg)
-    -> List String
-    -> Bool
-    -> Maybe String
-    -> String
-    -> (( String, AjaxParams ) -> String)
-    -> (( String, AjaxParams ) -> ( List (GroupSelectTwoOption msg), AjaxParams ))
-    -> JD.Decoder msg
-ajaxLocation id_ delay sender defaults parents showSearch noResultsMessage url data processResults =
-    JD.map2 (,)
-        (JD.map2 (,)
-            (JD.map2 (+)
-                (JD.at [ "offsetLeft" ] JD.float)
-                (parentSize "Left" parents)
-            )
-            (JD.map2 (+)
-                (JD.at [ "clientHeight" ] JD.float)
-                (JD.map2 (+)
-                    (JD.at [ "offsetTop" ] JD.float)
-                    (parentSize "Top" parents)
-                )
-            )
-        )
-        (JD.at [ "offsetWidth" ] JD.float)
-        |> JD.map
-            (buildDropdown id_
+                ajax
                 delay
-                sender
-                defaults
-                []
-                showSearch
-                (Just ( url, data, processResults, { page = 1, term = "", more = False, loading = True } ))
-                True
                 noResultsMessage
             )
         |> JD.map ((SelectTwoTrigger parents) >> sender)
@@ -112,19 +67,17 @@ parentSize dir oldParents =
                 JD.field "scrollTop" JD.float
 
 
-buildDropdown : String -> Float -> (SelectTwoMsg msg -> msg) -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Bool -> Maybe (SelectTwoAjaxStuff msg) -> Bool -> Maybe String -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
-buildDropdown id_ delay sender defaults list showSearch ajaxStuff isAjax noResultsMessage ( ( x, y ), width ) =
+buildDropdown : String -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Bool -> Bool -> Float -> Maybe String -> ( ( Float, Float ), Float ) -> SelectTwoDropdown msg
+buildDropdown id_ defaults list showSearch ajax delay noResultsMessage ( ( x, y ), width ) =
     { id_ = id_
-    , sender = sender
     , defaults = defaults
     , list = list
     , showSearch = showSearch
     , x = x
     , y = y
     , width = width
-    , ajaxStuff = ajaxStuff
+    , ajax = ajax
     , delay = delay
-    , isAjax = isAjax
     , noResultsMessage = noResultsMessage
     }
 
@@ -171,3 +124,13 @@ closest class decoder =
 asTuple : (a -> b) -> (a -> c) -> a -> ( b, c )
 asTuple f1 f2 a =
     ( f1 a, f2 a )
+
+
+defaultParams : String -> AjaxParams
+defaultParams filter =
+    { page = 1, term = filter, more = False, loading = True }
+
+
+uncurry3 : (a -> b -> c -> d) -> ( a, b, c ) -> d
+uncurry3 f ( a, b, c ) =
+    f a b c

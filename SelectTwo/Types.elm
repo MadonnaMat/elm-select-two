@@ -5,7 +5,7 @@ module SelectTwo.Types exposing (..)
 
 # Types
 
-@docs SelectTwoConfig, SelectTwoMsg, Model,SelectTwo, SelectTwoDropdown, GroupSelectTwoOption, SelectTwoOption, SelectTwoAjaxStuff, AjaxParams, ScrollInfo
+@docs SelectTwoConfig, SelectTwoMsg, Model,SelectTwo, SelectTwoDropdown, GroupSelectTwoOption, SelectTwoOption, AjaxParams, ScrollInfo
 
 -}
 
@@ -22,10 +22,10 @@ type SelectTwoMsg msg
     | SelectTwoSelected (Maybe msg)
     | SetSelectTwoSearch String
     | DelayedSelectTwoAjax String
-    | SelectTwoAjax (SelectTwoAjaxStuff msg) Bool (Result Http.Error String)
     | STRes (Result Dom.Error ())
     | STMsg msg
     | STNull
+    | SentAjax String AjaxParams Bool
     | ResultScroll ScrollInfo
 
 
@@ -42,17 +42,15 @@ type alias SelectTwoConfig msg =
     , id_ : String
     , list : List (GroupSelectTwoOption msg)
     , parents : List String
-    , url : Maybe String
-    , data : ( String, AjaxParams ) -> String
-    , processResults : ( String, AjaxParams ) -> ( List (GroupSelectTwoOption msg), AjaxParams )
     , clearMsg : Maybe (Maybe msg -> msg)
     , showSearch : Bool
     , width : String
     , placeholder : String
     , disabled : Bool
     , multiSelect : Bool
-    , delay : Float
     , noResultsMessage : Maybe String
+    , ajax : Bool
+    , delay : Float
     }
 
 
@@ -75,7 +73,7 @@ type alias GroupSelectTwoOption msg =
 {-| Rows in a select table, first option is the command message to be sent, second is the html to be displayed, and third is the string to search on, and the fourth is if it is disabled or not
 -}
 type alias SelectTwoOption msg =
-    ( Maybe msg, Html msg, String, Bool )
+    ( Maybe msg, String, Bool )
 
 
 {-| Structure created in users model when select2 is activated
@@ -86,7 +84,9 @@ type alias SelectTwo msg =
     , search : Maybe String
     , parents : List String
     , list : List (GroupSelectTwoOption msg)
-    , ajaxStuff : Maybe (SelectTwoAjaxStuff msg)
+    , ajax : Bool
+    , id_ : String
+    , ajaxParams : Maybe AjaxParams
     }
 
 
@@ -94,24 +94,16 @@ type alias SelectTwo msg =
 -}
 type alias SelectTwoDropdown msg =
     { id_ : String
-    , sender : SelectTwoMsg msg -> msg
     , defaults : List (SelectTwoOption msg)
     , list : List (GroupSelectTwoOption msg)
     , showSearch : Bool
     , x : Float
     , y : Float
     , width : Float
-    , ajaxStuff : Maybe (SelectTwoAjaxStuff msg)
+    , ajax : Bool
     , delay : Float
-    , isAjax : Bool
     , noResultsMessage : Maybe String
     }
-
-
-{-| Things needed to make Ajax calls
--}
-type alias SelectTwoAjaxStuff msg =
-    ( String, ( String, AjaxParams ) -> String, ( String, AjaxParams ) -> ( List (GroupSelectTwoOption msg), AjaxParams ), AjaxParams )
 
 
 {-| -}

@@ -3359,155 +3359,6 @@ var _Fresheyeball$elm_tuple_extra$Tuple3$first = function (_p28) {
 	var _p29 = _p28;
 	return _p29._0;
 };
-var _Fresheyeball$elm_tuple_extra$Tuple4$toList = function (_p0) {
-	var _p1 = _p0;
-	return {
-		ctor: '::',
-		_0: _p1._0,
-		_1: {
-			ctor: '::',
-			_0: _p1._1,
-			_1: {
-				ctor: '::',
-				_0: _p1._2,
-				_1: {
-					ctor: '::',
-					_0: _p1._3,
-					_1: {ctor: '[]'}
-				}
-			}
-		}
-	};
-};
-var _Fresheyeball$elm_tuple_extra$Tuple4$swirll = function (_p2) {
-	var _p3 = _p2;
-	return {ctor: '_Tuple3', _0: _p3._2, _1: _p3._0, _2: _p3._1};
-};
-var _Fresheyeball$elm_tuple_extra$Tuple4$swirlr = function (_p4) {
-	var _p5 = _p4;
-	return {ctor: '_Tuple3', _0: _p5._1, _1: _p5._2, _2: _p5._0};
-};
-var _Fresheyeball$elm_tuple_extra$Tuple4$sortWith = F2(
-	function (cmp, _p6) {
-		var _p7 = _p6;
-		var _p9 = _p7._3;
-		var _p8 = A2(
-			_Fresheyeball$elm_tuple_extra$Tuple3$sortWith,
-			cmp,
-			{ctor: '_Tuple3', _0: _p7._0, _1: _p7._1, _2: _p7._2});
-		var a_ = _p8._0;
-		var b_ = _p8._1;
-		var c_ = _p8._2;
-		var goesBefore = F2(
-			function (x, y) {
-				return !_elm_lang$core$Native_Utils.eq(
-					A2(cmp, x, y),
-					_elm_lang$core$Basics$GT);
-			});
-		return A2(goesBefore, _p9, a_) ? {ctor: '_Tuple4', _0: _p9, _1: a_, _2: b_, _3: c_} : (A2(goesBefore, _p9, b_) ? {ctor: '_Tuple4', _0: a_, _1: _p9, _2: b_, _3: c_} : (A2(goesBefore, _p9, c_) ? {ctor: '_Tuple4', _0: a_, _1: b_, _2: _p9, _3: c_} : {ctor: '_Tuple4', _0: a_, _1: b_, _2: c_, _3: _p9}));
-	});
-var _Fresheyeball$elm_tuple_extra$Tuple4$sortBy = function (conv) {
-	return _Fresheyeball$elm_tuple_extra$Tuple4$sortWith(
-		F2(
-			function (x, y) {
-				return A2(
-					_elm_lang$core$Basics$compare,
-					conv(x),
-					conv(y));
-			}));
-};
-var _Fresheyeball$elm_tuple_extra$Tuple4$sort = _Fresheyeball$elm_tuple_extra$Tuple4$sortWith(_elm_lang$core$Basics$compare);
-var _Fresheyeball$elm_tuple_extra$Tuple4$mapAll = F2(
-	function (f, _p10) {
-		var _p11 = _p10;
-		return {
-			ctor: '_Tuple4',
-			_0: f(_p11._0),
-			_1: f(_p11._1),
-			_2: f(_p11._2),
-			_3: f(_p11._3)
-		};
-	});
-var _Fresheyeball$elm_tuple_extra$Tuple4$mapEach = F5(
-	function (f, f_, f__, ff, _p12) {
-		var _p13 = _p12;
-		return {
-			ctor: '_Tuple4',
-			_0: f(_p13._0),
-			_1: f_(_p13._1),
-			_2: f__(_p13._2),
-			_3: ff(_p13._3)
-		};
-	});
-var _Fresheyeball$elm_tuple_extra$Tuple4$mapFourth = F2(
-	function (f, _p14) {
-		var _p15 = _p14;
-		return {
-			ctor: '_Tuple4',
-			_0: _p15._0,
-			_1: _p15._1,
-			_2: _p15._2,
-			_3: f(_p15._3)
-		};
-	});
-var _Fresheyeball$elm_tuple_extra$Tuple4$map = _Fresheyeball$elm_tuple_extra$Tuple4$mapFourth;
-var _Fresheyeball$elm_tuple_extra$Tuple4$mapThird = F2(
-	function (f, _p16) {
-		var _p17 = _p16;
-		return {
-			ctor: '_Tuple4',
-			_0: _p17._0,
-			_1: _p17._1,
-			_2: f(_p17._2),
-			_3: _p17._3
-		};
-	});
-var _Fresheyeball$elm_tuple_extra$Tuple4$mapSecond = F2(
-	function (f, _p18) {
-		var _p19 = _p18;
-		return {
-			ctor: '_Tuple4',
-			_0: _p19._0,
-			_1: f(_p19._1),
-			_2: _p19._2,
-			_3: _p19._3
-		};
-	});
-var _Fresheyeball$elm_tuple_extra$Tuple4$mapFirst = F2(
-	function (f, _p20) {
-		var _p21 = _p20;
-		return {
-			ctor: '_Tuple4',
-			_0: f(_p21._0),
-			_1: _p21._1,
-			_2: _p21._2,
-			_3: _p21._3
-		};
-	});
-var _Fresheyeball$elm_tuple_extra$Tuple4$init = function (_p22) {
-	var _p23 = _p22;
-	return {ctor: '_Tuple3', _0: _p23._0, _1: _p23._1, _2: _p23._2};
-};
-var _Fresheyeball$elm_tuple_extra$Tuple4$tail = function (_p24) {
-	var _p25 = _p24;
-	return {ctor: '_Tuple3', _0: _p25._1, _1: _p25._2, _2: _p25._3};
-};
-var _Fresheyeball$elm_tuple_extra$Tuple4$fourth = function (_p26) {
-	var _p27 = _p26;
-	return _p27._3;
-};
-var _Fresheyeball$elm_tuple_extra$Tuple4$third = function (_p28) {
-	var _p29 = _p28;
-	return _p29._2;
-};
-var _Fresheyeball$elm_tuple_extra$Tuple4$second = function (_p30) {
-	var _p31 = _p30;
-	return _p31._1;
-};
-var _Fresheyeball$elm_tuple_extra$Tuple4$first = function (_p32) {
-	var _p33 = _p32;
-	return _p33._0;
-};
 //import Native.List //
 
 var _elm_lang$core$Native_Array = function() {
@@ -9556,11 +9407,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Types$SelectTwoConfig = function (a) {
 										return function (k) {
 											return function (l) {
 												return function (m) {
-													return function (n) {
-														return function (o) {
-															return {defaults: a, id_: b, list: c, parents: d, url: e, data: f, processResults: g, clearMsg: h, showSearch: i, width: j, placeholder: k, disabled: l, multiSelect: m, delay: n, noResultsMessage: o};
-														};
-													};
+													return {defaults: a, id_: b, list: c, parents: d, clearMsg: e, showSearch: f, width: g, placeholder: h, disabled: i, multiSelect: j, noResultsMessage: k, ajax: l, delay: m};
 												};
 											};
 										};
@@ -9578,9 +9425,9 @@ var _MadonnaMat$elm_select_two$SelectTwo_Types$AjaxParams = F4(
 	function (a, b, c, d) {
 		return {page: a, term: b, more: c, loading: d};
 	});
-var _MadonnaMat$elm_select_two$SelectTwo_Types$SelectTwo = F6(
-	function (a, b, c, d, e, f) {
-		return {dropdown: a, hovered: b, search: c, parents: d, list: e, ajaxStuff: f};
+var _MadonnaMat$elm_select_two$SelectTwo_Types$SelectTwo = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {dropdown: a, hovered: b, search: c, parents: d, list: e, ajax: f, id_: g, ajaxParams: h};
 	});
 var _MadonnaMat$elm_select_two$SelectTwo_Types$SelectTwoDropdown = function (a) {
 	return function (b) {
@@ -9592,11 +9439,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Types$SelectTwoDropdown = function (a) 
 							return function (h) {
 								return function (i) {
 									return function (j) {
-										return function (k) {
-											return function (l) {
-												return {id_: a, sender: b, defaults: c, list: d, showSearch: e, x: f, y: g, width: h, ajaxStuff: i, delay: j, isAjax: k, noResultsMessage: l};
-											};
-										};
+										return {id_: a, defaults: b, list: c, showSearch: d, x: e, y: f, width: g, ajax: h, delay: i, noResultsMessage: j};
 									};
 								};
 							};
@@ -9614,6 +9457,10 @@ var _MadonnaMat$elm_select_two$SelectTwo_Types$ScrollInfo = F2(
 var _MadonnaMat$elm_select_two$SelectTwo_Types$ResultScroll = function (a) {
 	return {ctor: 'ResultScroll', _0: a};
 };
+var _MadonnaMat$elm_select_two$SelectTwo_Types$SentAjax = F3(
+	function (a, b, c) {
+		return {ctor: 'SentAjax', _0: a, _1: b, _2: c};
+	});
 var _MadonnaMat$elm_select_two$SelectTwo_Types$STNull = {ctor: 'STNull'};
 var _MadonnaMat$elm_select_two$SelectTwo_Types$STMsg = function (a) {
 	return {ctor: 'STMsg', _0: a};
@@ -9621,10 +9468,6 @@ var _MadonnaMat$elm_select_two$SelectTwo_Types$STMsg = function (a) {
 var _MadonnaMat$elm_select_two$SelectTwo_Types$STRes = function (a) {
 	return {ctor: 'STRes', _0: a};
 };
-var _MadonnaMat$elm_select_two$SelectTwo_Types$SelectTwoAjax = F3(
-	function (a, b, c) {
-		return {ctor: 'SelectTwoAjax', _0: a, _1: b, _2: c};
-	});
 var _MadonnaMat$elm_select_two$SelectTwo_Types$DelayedSelectTwoAjax = function (a) {
 	return {ctor: 'DelayedSelectTwoAjax', _0: a};
 };
@@ -10978,6 +10821,14 @@ var _elm_community$list_extra$List_Extra$init = function () {
 }();
 var _elm_community$list_extra$List_Extra$last = _elm_community$list_extra$List_Extra$foldl1(
 	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
+var _MadonnaMat$elm_select_two$SelectTwo_Private$uncurry3 = F2(
+	function (f, _p0) {
+		var _p1 = _p0;
+		return A3(f, _p1._0, _p1._1, _p1._2);
+	});
+var _MadonnaMat$elm_select_two$SelectTwo_Private$defaultParams = function (filter) {
+	return {page: 1, term: filter, more: false, loading: true};
+};
 var _MadonnaMat$elm_select_two$SelectTwo_Private$asTuple = F3(
 	function (f1, f2, a) {
 		return {
@@ -11000,26 +10851,26 @@ var _MadonnaMat$elm_select_two$SelectTwo_Private$className = A2(
 var _MadonnaMat$elm_select_two$SelectTwo_Private$hasClass = function ($class) {
 	return A2(
 		_MadonnaMat$elm_select_two$SelectTwo_Private$decodeIf,
-		function (_p0) {
+		function (_p2) {
 			return A2(
 				_elm_lang$core$Maybe$withDefault,
 				false,
 				A2(
 					_elm_lang$core$Maybe$map,
-					function (_p1) {
+					function (_p3) {
 						return A2(
 							_elm_lang$core$List$member,
 							$class,
-							A2(_elm_lang$core$String$split, ' ', _p1));
+							A2(_elm_lang$core$String$split, ' ', _p3));
 					},
-					_p0));
+					_p2));
 		},
 		_MadonnaMat$elm_select_two$SelectTwo_Private$className);
 };
 var _MadonnaMat$elm_select_two$SelectTwo_Private$closest = F2(
 	function ($class, decoder) {
-		var body = function (_p2) {
-			var _p3 = _p2;
+		var body = function (_p4) {
+			var _p5 = _p4;
 			return _elm_lang$core$Json_Decode$oneOf(
 				{
 					ctor: '::',
@@ -11036,7 +10887,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Private$closest = F2(
 		};
 		return _elm_lang$core$Json_Decode$lazy(body);
 	});
-var _MadonnaMat$elm_select_two$SelectTwo_Private$px = function (_p4) {
+var _MadonnaMat$elm_select_two$SelectTwo_Private$px = function (_p6) {
 	return A3(
 		_elm_lang$core$Basics$flip,
 		F2(
@@ -11044,189 +10895,56 @@ var _MadonnaMat$elm_select_two$SelectTwo_Private$px = function (_p4) {
 				return A2(_elm_lang$core$Basics_ops['++'], x, y);
 			}),
 		'px',
-		_elm_lang$core$Basics$toString(_p4));
+		_elm_lang$core$Basics$toString(_p6));
 };
-var _MadonnaMat$elm_select_two$SelectTwo_Private$buildDropdown = function (id_) {
-	return function (delay) {
-		return function (sender) {
-			return function (defaults) {
-				return function (list) {
-					return function (showSearch) {
-						return function (ajaxStuff) {
-							return function (isAjax) {
-								return function (noResultsMessage) {
-									return function (_p5) {
-										var _p6 = _p5;
-										return {id_: id_, sender: sender, defaults: defaults, list: list, showSearch: showSearch, x: _p6._0._0, y: _p6._0._1, width: _p6._1, ajaxStuff: ajaxStuff, delay: delay, isAjax: isAjax, noResultsMessage: noResultsMessage};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
+var _MadonnaMat$elm_select_two$SelectTwo_Private$buildDropdown = F8(
+	function (id_, defaults, list, showSearch, ajax, delay, noResultsMessage, _p7) {
+		var _p8 = _p7;
+		return {id_: id_, defaults: defaults, list: list, showSearch: showSearch, x: _p8._0._0, y: _p8._0._1, width: _p8._1, ajax: ajax, delay: delay, noResultsMessage: noResultsMessage};
+	});
 var _MadonnaMat$elm_select_two$SelectTwo_Private$parentSize = F2(
 	function (dir, oldParents) {
 		var uncons = _elm_community$list_extra$List_Extra$uncons(oldParents);
-		var _p7 = uncons;
-		if (_p7.ctor === 'Just') {
-			var _p10 = _p7._0._0;
+		var _p9 = uncons;
+		if (_p9.ctor === 'Just') {
+			var _p12 = _p9._0._0;
 			return A3(
 				_elm_lang$core$Json_Decode$map2,
 				F2(
 					function (x, y) {
 						return x + y;
 					}),
-				A2(_MadonnaMat$elm_select_two$SelectTwo_Private$parentSize, dir, _p7._0._1),
+				A2(_MadonnaMat$elm_select_two$SelectTwo_Private$parentSize, dir, _p9._0._1),
 				A3(
 					_elm_lang$core$Json_Decode$map2,
 					F2(
 						function (x, y) {
 							return x - y;
 						}),
-					function (_p8) {
+					function (_p10) {
 						return A2(
 							_MadonnaMat$elm_select_two$SelectTwo_Private$closest,
-							_p10,
+							_p12,
 							A2(
 								_elm_lang$core$Json_Decode$field,
 								A2(_elm_lang$core$Basics_ops['++'], 'offset', dir),
-								_p8));
+								_p10));
 					}(_elm_lang$core$Json_Decode$float),
-					function (_p9) {
+					function (_p11) {
 						return A2(
 							_MadonnaMat$elm_select_two$SelectTwo_Private$closest,
-							_p10,
+							_p12,
 							A2(
 								_elm_lang$core$Json_Decode$field,
 								A2(_elm_lang$core$Basics_ops['++'], 'scroll', dir),
-								_p9));
+								_p11));
 					}(_elm_lang$core$Json_Decode$float)));
 		} else {
 			return A2(_elm_lang$core$Json_Decode$field, 'scrollTop', _elm_lang$core$Json_Decode$float);
 		}
 	});
-var _MadonnaMat$elm_select_two$SelectTwo_Private$ajaxLocation = function (id_) {
-	return function (delay) {
-		return function (sender) {
-			return function (defaults) {
-				return function (parents) {
-					return function (showSearch) {
-						return function (noResultsMessage) {
-							return function (url) {
-								return function (data) {
-									return function (processResults) {
-										return function (_p11) {
-											return A2(
-												_elm_lang$core$Json_Decode$field,
-												'target',
-												A2(_MadonnaMat$elm_select_two$SelectTwo_Private$closest, 'select2', _p11));
-										}(
-											A2(
-												_elm_lang$core$Json_Decode$map,
-												function (_p12) {
-													return sender(
-														A2(_MadonnaMat$elm_select_two$SelectTwo_Types$SelectTwoTrigger, parents, _p12));
-												},
-												A2(
-													_elm_lang$core$Json_Decode$map,
-													A9(
-														_MadonnaMat$elm_select_two$SelectTwo_Private$buildDropdown,
-														id_,
-														delay,
-														sender,
-														defaults,
-														{ctor: '[]'},
-														showSearch,
-														_elm_lang$core$Maybe$Just(
-															{
-																ctor: '_Tuple4',
-																_0: url,
-																_1: data,
-																_2: processResults,
-																_3: {page: 1, term: '', more: false, loading: true}
-															}),
-														true,
-														noResultsMessage),
-													A3(
-														_elm_lang$core$Json_Decode$map2,
-														F2(
-															function (v0, v1) {
-																return {ctor: '_Tuple2', _0: v0, _1: v1};
-															}),
-														A3(
-															_elm_lang$core$Json_Decode$map2,
-															F2(
-																function (v0, v1) {
-																	return {ctor: '_Tuple2', _0: v0, _1: v1};
-																}),
-															A3(
-																_elm_lang$core$Json_Decode$map2,
-																F2(
-																	function (x, y) {
-																		return x + y;
-																	}),
-																A2(
-																	_elm_lang$core$Json_Decode$at,
-																	{
-																		ctor: '::',
-																		_0: 'offsetLeft',
-																		_1: {ctor: '[]'}
-																	},
-																	_elm_lang$core$Json_Decode$float),
-																A2(_MadonnaMat$elm_select_two$SelectTwo_Private$parentSize, 'Left', parents)),
-															A3(
-																_elm_lang$core$Json_Decode$map2,
-																F2(
-																	function (x, y) {
-																		return x + y;
-																	}),
-																A2(
-																	_elm_lang$core$Json_Decode$at,
-																	{
-																		ctor: '::',
-																		_0: 'clientHeight',
-																		_1: {ctor: '[]'}
-																	},
-																	_elm_lang$core$Json_Decode$float),
-																A3(
-																	_elm_lang$core$Json_Decode$map2,
-																	F2(
-																		function (x, y) {
-																			return x + y;
-																		}),
-																	A2(
-																		_elm_lang$core$Json_Decode$at,
-																		{
-																			ctor: '::',
-																			_0: 'offsetTop',
-																			_1: {ctor: '[]'}
-																		},
-																		_elm_lang$core$Json_Decode$float),
-																	A2(_MadonnaMat$elm_select_two$SelectTwo_Private$parentSize, 'Top', parents)))),
-														A2(
-															_elm_lang$core$Json_Decode$at,
-															{
-																ctor: '::',
-																_0: 'offsetWidth',
-																_1: {ctor: '[]'}
-															},
-															_elm_lang$core$Json_Decode$float)))));
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _MadonnaMat$elm_select_two$SelectTwo_Private$location = F8(
-	function (id_, delay, sender, defaults, list, parents, showSearch, noResultsMessage) {
+var _MadonnaMat$elm_select_two$SelectTwo_Private$location = F9(
+	function (id_, sender, defaults, list, parents, showSearch, noResultsMessage, ajax, delay) {
 		return function (_p13) {
 			return A2(
 				_elm_lang$core$Json_Decode$field,
@@ -11241,7 +10959,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Private$location = F8(
 				},
 				A2(
 					_elm_lang$core$Json_Decode$map,
-					A9(_MadonnaMat$elm_select_two$SelectTwo_Private$buildDropdown, id_, delay, sender, defaults, list, showSearch, _elm_lang$core$Maybe$Nothing, false, noResultsMessage),
+					A7(_MadonnaMat$elm_select_two$SelectTwo_Private$buildDropdown, id_, defaults, list, showSearch, ajax, delay, noResultsMessage),
 					A3(
 						_elm_lang$core$Json_Decode$map2,
 						F2(
@@ -11320,7 +11038,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Private$filterList = F2(
 						A3(
 							_elm_lang$core$Basics$flip,
 							_elm_lang$core$String$contains,
-							_elm_lang$core$String$toLower(_p16._2),
+							_elm_lang$core$String$toLower(_p16._1),
 							_elm_lang$core$String$toLower(_p17)));
 				},
 				filter));
@@ -11336,17 +11054,36 @@ var _MadonnaMat$elm_select_two$SelectTwo_Private$filterGroup = F2(
 var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
 var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
 var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
+var _MadonnaMat$elm_select_two$SelectTwo$defaultsFromList = F2(
+	function (defaults, list) {
+		return A2(
+			_elm_lang$core$List$filter,
+			function (l) {
+				return A2(
+					_elm_lang$core$Maybe$withDefault,
+					false,
+					A2(
+						_elm_lang$core$Maybe$map,
+						A2(_elm_lang$core$Basics$flip, _elm_lang$core$List$member, defaults),
+						_Fresheyeball$elm_tuple_extra$Tuple3$first(l)));
+			},
+			A2(
+				_elm_lang$core$List$concatMap,
+				function (_p0) {
+					var _p1 = _p0;
+					return _p1._1;
+				},
+				list));
+	});
 var _MadonnaMat$elm_select_two$SelectTwo$selectOption = F2(
-	function (msg, _p0) {
-		var _p1 = _p0;
-		var _p2 = _p1._1;
+	function (msg, _p2) {
+		var _p3 = _p2;
 		return {
-			ctor: '_Tuple4',
+			ctor: '_Tuple3',
 			_0: _elm_lang$core$Maybe$Just(
-				msg(_p1._0)),
-			_1: _elm_lang$html$Html$text(_p2),
-			_2: _p2,
-			_3: true
+				msg(_p3._0)),
+			_1: _p3._1,
+			_2: true
 		};
 	});
 var _MadonnaMat$elm_select_two$SelectTwo$selectGroup = F2(
@@ -11362,11 +11099,11 @@ var _MadonnaMat$elm_select_two$SelectTwo$selectGroup = F2(
 					_elm_lang$core$List$head(list))),
 			_1: A2(
 				_elm_lang$core$List$map,
-				function (_p3) {
+				function (_p4) {
 					return A2(
 						_MadonnaMat$elm_select_two$SelectTwo$selectOption,
 						msg,
-						_Fresheyeball$elm_tuple_extra$Tuple3$init(_p3));
+						_Fresheyeball$elm_tuple_extra$Tuple3$init(_p4));
 				},
 				list)
 		};
@@ -11379,10 +11116,10 @@ var _MadonnaMat$elm_select_two$SelectTwo$basicGroupSelectOptions = F2(
 			A2(
 				_elm_community$list_extra$List_Extra$groupWhile,
 				F2(
-					function (_p5, _p4) {
-						var _p6 = _p5;
-						var _p7 = _p4;
-						return _elm_lang$core$Native_Utils.eq(_p6._2, _p7._2);
+					function (_p6, _p5) {
+						var _p7 = _p6;
+						var _p8 = _p5;
+						return _elm_lang$core$Native_Utils.eq(_p7._2, _p8._2);
 					}),
 				list));
 	});
@@ -11423,6 +11160,87 @@ var _MadonnaMat$elm_select_two$SelectTwo$setSearch = function (filter) {
 				{search: search});
 		});
 };
+var _MadonnaMat$elm_select_two$SelectTwo$setLoading = F3(
+	function (ajaxParams, reset, model) {
+		var list = A2(
+			_elm_lang$core$Maybe$withDefault,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (_) {
+					return _.list;
+				},
+				model.selectTwo));
+		return A2(
+			_MadonnaMat$elm_select_two$SelectTwo$map,
+			function (s) {
+				return _elm_lang$core$Native_Utils.update(
+					s,
+					{
+						list: reset ? {ctor: '[]'} : list,
+						ajaxParams: _elm_lang$core$Maybe$Just(
+							_elm_lang$core$Native_Utils.update(
+								ajaxParams,
+								{loading: true}))
+					});
+			},
+			model);
+	});
+var _MadonnaMat$elm_select_two$SelectTwo$setList = F3(
+	function (list, ajaxParams, model) {
+		var tempList = A2(
+			_elm_lang$core$Basics_ops['++'],
+			A2(
+				_elm_lang$core$Maybe$withDefault,
+				{ctor: '[]'},
+				A2(
+					_elm_lang$core$Maybe$map,
+					function (_) {
+						return _.list;
+					},
+					model.selectTwo)),
+			list);
+		var newList = A2(
+			_elm_lang$core$List$map,
+			A2(
+				_MadonnaMat$elm_select_two$SelectTwo_Private$asTuple,
+				function (_p9) {
+					return A2(
+						_elm_lang$core$Maybe$withDefault,
+						'',
+						A2(
+							_elm_lang$core$Maybe$map,
+							_elm_lang$core$Tuple$first,
+							_elm_lang$core$List$head(_p9)));
+				},
+				function (_p10) {
+					return _elm_lang$core$List$concat(
+						A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$second, _p10));
+				}),
+			A2(
+				_elm_community$list_extra$List_Extra$groupWhile,
+				F2(
+					function (x, y) {
+						return _elm_lang$core$Native_Utils.eq(
+							_elm_lang$core$Tuple$first(x),
+							_elm_lang$core$Tuple$first(y));
+					}),
+				tempList));
+		return A2(
+			_MadonnaMat$elm_select_two$SelectTwo$map,
+			function (s) {
+				return _elm_lang$core$Native_Utils.update(
+					s,
+					{
+						list: newList,
+						ajaxParams: _elm_lang$core$Maybe$Just(
+							_elm_lang$core$Native_Utils.update(
+								ajaxParams,
+								{loading: false}))
+					});
+			},
+			model);
+	});
 var _MadonnaMat$elm_select_two$SelectTwo$new = F3(
 	function (parents, dropdown, model) {
 		return _elm_lang$core$Native_Utils.update(
@@ -11435,57 +11253,37 @@ var _MadonnaMat$elm_select_two$SelectTwo$new = F3(
 						search: _elm_lang$core$Maybe$Nothing,
 						parents: parents,
 						list: {ctor: '[]'},
-						ajaxStuff: dropdown.ajaxStuff
+						ajaxParams: _elm_lang$core$Maybe$Just(
+							_MadonnaMat$elm_select_two$SelectTwo_Private$defaultParams('')),
+						ajax: dropdown.ajax,
+						id_: dropdown.id_
 					})
 			});
 	});
-var _MadonnaMat$elm_select_two$SelectTwo$ajaxCmd = F3(
-	function (f, reset, model) {
-		var _p8 = model.selectTwo;
-		if (_p8.ctor === 'Just') {
-			var _p14 = _p8._0;
-			var sender = _p14.dropdown.sender;
-			var ajaxStuff = _elm_lang$core$Native_Utils.eq(_p14.ajaxStuff, _elm_lang$core$Maybe$Nothing) ? _p14.dropdown.ajaxStuff : _p14.ajaxStuff;
-			var _p9 = ajaxStuff;
-			if (_p9.ctor === 'Just') {
-				var _p13 = _p9._0._0;
-				var _p12 = _p9._0._3;
-				var _p11 = _p9._0._1;
-				return A2(
-					_elm_lang$http$Http$send,
-					function (_p10) {
-						return sender(
-							A3(
-								_MadonnaMat$elm_select_two$SelectTwo_Types$SelectTwoAjax,
-								{
-									ctor: '_Tuple4',
-									_0: _p13,
-									_1: _p11,
-									_2: _p9._0._2,
-									_3: f(_p12)
-								},
-								reset,
-								_p10));
+var _MadonnaMat$elm_select_two$SelectTwo$ajaxCmd = F4(
+	function (sender, ajaxParams, reset, model) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			_elm_lang$core$Platform_Cmd$none,
+			A2(
+				_elm_lang$core$Maybe$map,
+				function (id_) {
+					return _MadonnaMat$elm_select_two$SelectTwo$send(
+						sender(
+							A3(_MadonnaMat$elm_select_two$SelectTwo_Types$SentAjax, id_, ajaxParams, reset)));
+				},
+				A2(
+					_elm_lang$core$Maybe$andThen,
+					function (st) {
+						return st.ajax ? _elm_lang$core$Maybe$Just(st.id_) : _elm_lang$core$Maybe$Nothing;
 					},
-					_elm_lang$http$Http$getString(
-						_p11(
-							{
-								ctor: '_Tuple2',
-								_0: _p13,
-								_1: f(_p12)
-							})));
-			} else {
-				return _elm_lang$core$Platform_Cmd$none;
-			}
-		} else {
-			return _elm_lang$core$Platform_Cmd$none;
-		}
+					model.selectTwo)));
 	});
 var _MadonnaMat$elm_select_two$SelectTwo$delayedSend = F2(
 	function (milli, msg) {
 		return A2(
 			_elm_lang$core$Task$perform,
-			function (_p15) {
+			function (_p11) {
 				return msg;
 			},
 			_elm_lang$core$Process$sleep(_elm_lang$core$Time$millisecond * milli));
@@ -11496,27 +11294,19 @@ var _MadonnaMat$elm_select_two$SelectTwo$incrementPage = F3(
 		var scrollPageTop = (_elm_lang$core$Basics$toFloat(scrollTop) - _elm_lang$core$Basics$toFloat(scrollHeight)) + scrollPageHeight;
 		return (_elm_lang$core$Native_Utils.cmp(scrollPageTop / scrollPageHeight, 0.7) > 0) && ((!params.loading) && params.more);
 	});
-var _MadonnaMat$elm_select_two$SelectTwo$sendPageIncrement = F4(
-	function (model, scrollTop, scrollHeight, _p16) {
-		var _p17 = _p16;
-		var _p18 = _p17._3;
-		if (A3(_MadonnaMat$elm_select_two$SelectTwo$incrementPage, scrollTop, scrollHeight, _p18)) {
+var _MadonnaMat$elm_select_two$SelectTwo$sendPageIncrement = F5(
+	function (sender, model, scrollTop, scrollHeight, ajaxParams) {
+		if (A3(_MadonnaMat$elm_select_two$SelectTwo$incrementPage, scrollTop, scrollHeight, ajaxParams)) {
 			var newModel = A2(
 				_MadonnaMat$elm_select_two$SelectTwo$map,
 				function (s) {
 					return _elm_lang$core$Native_Utils.update(
 						s,
 						{
-							ajaxStuff: _elm_lang$core$Maybe$Just(
-								{
-									ctor: '_Tuple4',
-									_0: _p17._0,
-									_1: _p17._1,
-									_2: _p17._2,
-									_3: _elm_lang$core$Native_Utils.update(
-										_p18,
-										{loading: true, page: _p18.page + 1})
-								})
+							ajaxParams: _elm_lang$core$Maybe$Just(
+								_elm_lang$core$Native_Utils.update(
+									ajaxParams,
+									{page: ajaxParams.page + 1}))
 						});
 				},
 				model);
@@ -11526,44 +11316,48 @@ var _MadonnaMat$elm_select_two$SelectTwo$sendPageIncrement = F4(
 					newModel,
 					{
 						ctor: '::',
-						_0: A3(_MadonnaMat$elm_select_two$SelectTwo$ajaxCmd, _elm_lang$core$Basics$identity, false, newModel),
+						_0: A4(
+							_MadonnaMat$elm_select_two$SelectTwo$ajaxCmd,
+							sender,
+							A2(
+								_elm_lang$core$Maybe$withDefault,
+								_MadonnaMat$elm_select_two$SelectTwo_Private$defaultParams(''),
+								A2(
+									_elm_lang$core$Maybe$andThen,
+									function (_) {
+										return _.ajaxParams;
+									},
+									newModel.selectTwo)),
+							false,
+							newModel),
 						_1: {ctor: '[]'}
 					}));
 		} else {
 			return _elm_lang$core$Maybe$Nothing;
 		}
 	});
-var _MadonnaMat$elm_select_two$SelectTwo$checkScrollPage = F3(
-	function (scrollTop, scrollHeight, model) {
-		var ajaxStuff = A2(
-			_elm_lang$core$Maybe$map,
-			function (_) {
-				return _.ajaxStuff;
-			},
-			model.selectTwo);
+var _MadonnaMat$elm_select_two$SelectTwo$checkScrollPage = F4(
+	function (scrollTop, scrollHeight, sender, model) {
 		return A2(
 			_elm_lang$core$Maybe$withDefault,
 			{ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none},
 			A2(
 				_elm_lang$core$Maybe$andThen,
-				A3(_MadonnaMat$elm_select_two$SelectTwo$sendPageIncrement, model, scrollTop, scrollHeight),
+				A4(_MadonnaMat$elm_select_two$SelectTwo$sendPageIncrement, sender, model, scrollTop, scrollHeight),
 				A2(
 					_elm_lang$core$Maybe$andThen,
-					_elm_lang$core$Basics$identity,
-					A2(
-						_elm_lang$core$Maybe$map,
-						function (_) {
-							return _.ajaxStuff;
-						},
-						model.selectTwo))));
+					function (_) {
+						return _.ajaxParams;
+					},
+					model.selectTwo)));
 	});
-var _MadonnaMat$elm_select_two$SelectTwo$update = F2(
-	function (msg, model) {
-		var _p19 = msg;
-		switch (_p19.ctor) {
+var _MadonnaMat$elm_select_two$SelectTwo$update = F4(
+	function (sender, msg, maybeAjax, model) {
+		var _p12 = msg;
+		switch (_p12.ctor) {
 			case 'SelectTwoTrigger':
-				var _p21 = _p19._1;
-				var newModel = A3(_MadonnaMat$elm_select_two$SelectTwo$new, _p19._0, _p21, model);
+				var _p14 = _p12._1;
+				var newModel = A3(_MadonnaMat$elm_select_two$SelectTwo$new, _p12._0, _p14, model);
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					newModel,
@@ -11571,17 +11365,26 @@ var _MadonnaMat$elm_select_two$SelectTwo$update = F2(
 						ctor: '::',
 						_0: A2(
 							_elm_lang$core$Task$attempt,
-							function (_p20) {
-								return _p21.sender(
-									_MadonnaMat$elm_select_two$SelectTwo_Types$STRes(_p20));
+							function (_p13) {
+								return sender(
+									_MadonnaMat$elm_select_two$SelectTwo_Types$STRes(_p13));
 							},
 							_elm_lang$dom$Dom$focus(
-								A2(_elm_lang$core$Basics_ops['++'], _p21.id_, '--search'))),
+								A2(_elm_lang$core$Basics_ops['++'], _p14.id_, '--search'))),
 						_1: {
 							ctor: '::',
-							_0: A3(
+							_0: A4(
 								_MadonnaMat$elm_select_two$SelectTwo$ajaxCmd,
-								_elm_lang$core$Basics$identity,
+								sender,
+								A2(
+									_elm_lang$core$Maybe$withDefault,
+									_MadonnaMat$elm_select_two$SelectTwo_Private$defaultParams(''),
+									A2(
+										_elm_lang$core$Maybe$andThen,
+										function (_) {
+											return _.ajaxParams;
+										},
+										newModel.selectTwo)),
 								false,
 								A2(
 									_MadonnaMat$elm_select_two$SelectTwo$map,
@@ -11604,7 +11407,7 @@ var _MadonnaMat$elm_select_two$SelectTwo$update = F2(
 						function (s) {
 							return _elm_lang$core$Native_Utils.update(
 								s,
-								{hovered: _p19._0});
+								{hovered: _p12._0});
 						},
 						model),
 					{ctor: '[]'});
@@ -11619,14 +11422,14 @@ var _MadonnaMat$elm_select_two$SelectTwo$update = F2(
 						_0: A2(
 							_elm_lang$core$Maybe$withDefault,
 							_elm_lang$core$Platform_Cmd$none,
-							A2(_elm_lang$core$Maybe$map, _MadonnaMat$elm_select_two$SelectTwo$send, _p19._0)),
+							A2(_elm_lang$core$Maybe$map, _MadonnaMat$elm_select_two$SelectTwo$send, _p12._0)),
 						_1: {ctor: '[]'}
 					});
 			case 'SetSelectTwoSearch':
-				var _p22 = _p19._0;
+				var _p15 = _p12._0;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
-					A2(_MadonnaMat$elm_select_two$SelectTwo$setSearch, _p22, model),
+					A2(_MadonnaMat$elm_select_two$SelectTwo$setSearch, _p15, model),
 					{
 						ctor: '::',
 						_0: A2(
@@ -11639,8 +11442,8 @@ var _MadonnaMat$elm_select_two$SelectTwo$update = F2(
 										A2(
 											_MadonnaMat$elm_select_two$SelectTwo$delayedSend,
 											dd.delay,
-											dd.sender(
-												_MadonnaMat$elm_select_two$SelectTwo_Types$DelayedSelectTwoAjax(_p22))));
+											sender(
+												_MadonnaMat$elm_select_two$SelectTwo_Types$DelayedSelectTwoAjax(_p15))));
 								},
 								A2(
 									_elm_lang$core$Maybe$map,
@@ -11651,7 +11454,7 @@ var _MadonnaMat$elm_select_two$SelectTwo$update = F2(
 						_1: {ctor: '[]'}
 					});
 			case 'DelayedSelectTwoAjax':
-				var _p23 = _p19._0;
+				var _p16 = _p12._0;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
@@ -11663,14 +11466,11 @@ var _MadonnaMat$elm_select_two$SelectTwo$update = F2(
 							A2(
 								_elm_lang$core$Maybe$andThen,
 								function (search) {
-									return _elm_lang$core$Native_Utils.eq(search, _p23) ? _elm_lang$core$Maybe$Just(
-										A3(
+									return _elm_lang$core$Native_Utils.eq(search, _p16) ? _elm_lang$core$Maybe$Just(
+										A4(
 											_MadonnaMat$elm_select_two$SelectTwo$ajaxCmd,
-											function (p) {
-												return _elm_lang$core$Native_Utils.update(
-													p,
-													{page: 1, term: _p23, more: false, loading: true});
-											},
+											sender,
+											_MadonnaMat$elm_select_two$SelectTwo_Private$defaultParams(_p16),
 											true,
 											A2(
 												_MadonnaMat$elm_select_two$SelectTwo$map,
@@ -11694,97 +11494,15 @@ var _MadonnaMat$elm_select_two$SelectTwo$update = F2(
 										model.selectTwo)))),
 						_1: {ctor: '[]'}
 					});
-			case 'SelectTwoAjax':
-				if (_p19._2.ctor === 'Ok') {
-					var _p27 = _p19._0._2;
-					var _p24 = _p27(
-						{
-							ctor: '_Tuple2',
-							_0: _p19._2._0,
-							_1: _elm_lang$core$Native_Utils.update(
-								_p19._0._3,
-								{loading: false})
-						});
-					var list = _p24._0;
-					var newParams = _p24._1;
-					var tempList = _p19._1 ? list : A2(
-						_elm_lang$core$Basics_ops['++'],
-						A2(
-							_elm_lang$core$Maybe$withDefault,
-							{ctor: '[]'},
-							A2(
-								_elm_lang$core$Maybe$map,
-								function (_) {
-									return _.list;
-								},
-								model.selectTwo)),
-						list);
-					var newList = A2(
-						_elm_lang$core$List$map,
-						A2(
-							_MadonnaMat$elm_select_two$SelectTwo_Private$asTuple,
-							function (_p25) {
-								return A2(
-									_elm_lang$core$Maybe$withDefault,
-									'',
-									A2(
-										_elm_lang$core$Maybe$map,
-										_elm_lang$core$Tuple$first,
-										_elm_lang$core$List$head(_p25)));
-							},
-							function (_p26) {
-								return _elm_lang$core$List$concat(
-									A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$second, _p26));
-							}),
-						A2(
-							_elm_community$list_extra$List_Extra$groupWhile,
-							F2(
-								function (x, y) {
-									return _elm_lang$core$Native_Utils.eq(
-										_elm_lang$core$Tuple$first(x),
-										_elm_lang$core$Tuple$first(y));
-								}),
-							tempList));
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						A2(
-							_MadonnaMat$elm_select_two$SelectTwo$map,
-							function (s) {
-								return _elm_lang$core$Native_Utils.update(
-									s,
-									{
-										list: newList,
-										ajaxStuff: _elm_lang$core$Maybe$Just(
-											{ctor: '_Tuple4', _0: _p19._0._0, _1: _p19._0._1, _2: _p27, _3: newParams})
-									});
-							},
-							model),
-						{ctor: '[]'});
-				} else {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						A2(
-							_MadonnaMat$elm_select_two$SelectTwo$map,
-							function (s) {
-								return _elm_lang$core$Native_Utils.update(
-									s,
-									{
-										list: {ctor: '[]'},
-										ajaxStuff: _elm_lang$core$Maybe$Just(_p19._0)
-									});
-							},
-							model),
-						{ctor: '[]'});
-				}
 			case 'ResultScroll':
-				return A3(_MadonnaMat$elm_select_two$SelectTwo$checkScrollPage, _p19._0.scrollTop, _p19._0.scrollHeight, model);
+				return A4(_MadonnaMat$elm_select_two$SelectTwo$checkScrollPage, _p12._0.scrollTop, _p12._0.scrollHeight, sender, model);
 			case 'STMsg':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
 					{
 						ctor: '::',
-						_0: _MadonnaMat$elm_select_two$SelectTwo$send(_p19._0),
+						_0: _MadonnaMat$elm_select_two$SelectTwo$send(_p12._0),
 						_1: {ctor: '[]'}
 					});
 			case 'STRes':
@@ -11792,12 +11510,36 @@ var _MadonnaMat$elm_select_two$SelectTwo$update = F2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
 					{ctor: '[]'});
-			default:
+			case 'STNull':
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					model,
 					{ctor: '[]'});
+			default:
+				return A2(
+					_elm_lang$core$Maybe$withDefault,
+					{ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none},
+					A2(
+						_elm_lang$core$Maybe$map,
+						A2(
+							_elm_lang$core$Basics$flip,
+							_MadonnaMat$elm_select_two$SelectTwo_Private$uncurry3,
+							{ctor: '_Tuple3', _0: _p12._0, _1: _p12._1, _2: _p12._2}),
+						maybeAjax));
 		}
+	});
+var _MadonnaMat$elm_select_two$SelectTwo_Html$runCustomHtml = F2(
+	function (customHtml, option) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			_elm_lang$html$Html$text(
+				_Fresheyeball$elm_tuple_extra$Tuple3$second(option)),
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				function (ch) {
+					return ch(option);
+				},
+				customHtml));
 	});
 var _MadonnaMat$elm_select_two$SelectTwo_Html$widthGuess = F2(
 	function (font, list) {
@@ -11824,7 +11566,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$widthGuess = F2(
 									_elm_lang$core$String$length,
 									A2(
 										_elm_lang$core$List$map,
-										_Fresheyeball$elm_tuple_extra$Tuple4$third,
+										_Fresheyeball$elm_tuple_extra$Tuple3$second,
 										A2(_elm_lang$core$List$concatMap, _elm_lang$core$Tuple$second, list)))))))));
 	});
 var _MadonnaMat$elm_select_two$SelectTwo_Html$preventScrolling = F2(
@@ -11872,12 +11614,12 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$noResultsFound = function (noResul
 			_1: {ctor: '[]'}
 		});
 };
-var _MadonnaMat$elm_select_two$SelectTwo_Html$select2ListItem = F4(
-	function (sender, defaults, hovered, option) {
+var _MadonnaMat$elm_select_two$SelectTwo_Html$select2ListItem = F5(
+	function (sender, defaults, hovered, customHtml, option) {
 		var _p0 = option;
 		var msg = _p0._0;
 		var display = _p0._1;
-		var enabled = _p0._3;
+		var enabled = _p0._2;
 		return A2(
 			_elm_lang$html$Html$li,
 			A2(
@@ -11940,22 +11682,21 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$select2ListItem = F4(
 				}),
 			{
 				ctor: '::',
-				_0: display,
+				_0: A2(_MadonnaMat$elm_select_two$SelectTwo_Html$runCustomHtml, customHtml, option),
 				_1: {ctor: '[]'}
 			});
 	});
 var _MadonnaMat$elm_select_two$SelectTwo_Html$selectTwoUniq = function (_p1) {
 	var _p2 = _p1;
 	return {
-		ctor: '_Tuple4',
+		ctor: '_Tuple3',
 		_0: _elm_lang$core$Basics$toString(_p2._0),
-		_1: _elm_lang$core$Basics$toString(_p2._1),
-		_2: _p2._2,
-		_3: _elm_lang$core$Basics$toString(_p2._3)
+		_1: _p2._1,
+		_2: _elm_lang$core$Basics$toString(_p2._2)
 	};
 };
-var _MadonnaMat$elm_select_two$SelectTwo_Html$select2ListGroup = F4(
-	function (sender, defaults, hovered, _p3) {
+var _MadonnaMat$elm_select_two$SelectTwo_Html$select2ListGroup = F5(
+	function (sender, defaults, hovered, customHtml, _p3) {
 		var _p4 = _p3;
 		return A2(
 			_elm_lang$html$Html$li,
@@ -11989,14 +11730,14 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$select2ListGroup = F4(
 						},
 						A2(
 							_elm_lang$core$List$map,
-							A3(_MadonnaMat$elm_select_two$SelectTwo_Html$select2ListItem, sender, defaults, hovered),
+							A4(_MadonnaMat$elm_select_two$SelectTwo_Html$select2ListItem, sender, defaults, hovered, customHtml),
 							A2(_elm_community$list_extra$List_Extra$uniqueBy, _MadonnaMat$elm_select_two$SelectTwo_Html$selectTwoUniq, _p4._1))),
 					_1: {ctor: '[]'}
 				}
 			});
 	});
-var _MadonnaMat$elm_select_two$SelectTwo_Html$listOrGroup = F5(
-	function (sender, defaults, list, hovered, search) {
+var _MadonnaMat$elm_select_two$SelectTwo_Html$listOrGroup = F6(
+	function (sender, defaults, list, hovered, search, customHtml) {
 		return (_elm_lang$core$Native_Utils.eq(
 			_elm_lang$core$List$length(list),
 			1) && _elm_lang$core$Native_Utils.eq(
@@ -12013,7 +11754,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$listOrGroup = F5(
 			A2(
 				_elm_lang$core$Maybe$map,
 				_elm_lang$core$List$map(
-					A3(_MadonnaMat$elm_select_two$SelectTwo_Html$select2ListItem, sender, defaults, hovered)),
+					A4(_MadonnaMat$elm_select_two$SelectTwo_Html$select2ListItem, sender, defaults, hovered, customHtml)),
 				A2(
 					_elm_lang$core$Maybe$map,
 					_elm_community$list_extra$List_Extra$uniqueBy(_MadonnaMat$elm_select_two$SelectTwo_Html$selectTwoUniq),
@@ -12026,7 +11767,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$listOrGroup = F5(
 							_elm_lang$core$Tuple$second,
 							_elm_lang$core$List$head(list)))))) : A2(
 			_elm_lang$core$List$map,
-			A3(_MadonnaMat$elm_select_two$SelectTwo_Html$select2ListGroup, sender, defaults, hovered),
+			A4(_MadonnaMat$elm_select_two$SelectTwo_Html$select2ListGroup, sender, defaults, hovered, customHtml),
 			A2(
 				_elm_lang$core$List$map,
 				_MadonnaMat$elm_select_two$SelectTwo_Private$filterGroup(search),
@@ -12082,11 +11823,10 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$scrollPosition = function (wrapper
 					},
 					_elm_lang$core$Json_Decode$int))));
 };
-var _MadonnaMat$elm_select_two$SelectTwo_Html$select2DropdownDraw = F5(
-	function (_p5, hovered, search, ajaxList, ajaxStuff) {
+var _MadonnaMat$elm_select_two$SelectTwo_Html$select2DropdownDraw = F7(
+	function (sender, _p5, hovered, search, ajaxList, ajaxParams, customHtml) {
 		var _p6 = _p5;
-		var _p12 = _p6.sender;
-		var _p11 = _p6.isAjax;
+		var _p11 = _p6.ajax;
 		var theList = _p11 ? ((A2(
 			_elm_lang$core$Maybe$withDefault,
 			false,
@@ -12094,22 +11834,16 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$select2DropdownDraw = F5(
 				_elm_lang$core$Maybe$map,
 				function (_p7) {
 					var _p8 = _p7;
-					return _p8._3.loading;
+					return _p8.loading;
 				},
-				ajaxStuff)) && _elm_lang$core$List$isEmpty(ajaxList)) ? {
+				ajaxParams)) && _elm_lang$core$List$isEmpty(ajaxList)) ? {
 			ctor: '::',
 			_0: {
 				ctor: '_Tuple2',
 				_0: '',
 				_1: {
 					ctor: '::',
-					_0: {
-						ctor: '_Tuple4',
-						_0: _elm_lang$core$Maybe$Nothing,
-						_1: _elm_lang$html$Html$text('Searching'),
-						_2: '',
-						_3: false
-					},
+					_0: {ctor: '_Tuple3', _0: _elm_lang$core$Maybe$Nothing, _1: 'Searching', _2: false},
 					_1: {ctor: '[]'}
 				}
 			},
@@ -12188,7 +11922,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$select2DropdownDraw = F5(
 												ctor: '::',
 												_0: _elm_lang$html$Html_Events$onInput(
 													function (_p9) {
-														return _p12(
+														return sender(
 															_MadonnaMat$elm_select_two$SelectTwo_Types$SetSelectTwoSearch(_p9));
 													}),
 												_1: {
@@ -12198,7 +11932,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$select2DropdownDraw = F5(
 														'click',
 														_MadonnaMat$elm_select_two$SelectTwo_Html$preventAndStop,
 														_elm_lang$core$Json_Decode$succeed(
-															_p12(_MadonnaMat$elm_select_two$SelectTwo_Types$STNull))),
+															sender(_MadonnaMat$elm_select_two$SelectTwo_Types$STNull))),
 													_1: {ctor: '[]'}
 												}
 											}
@@ -12230,7 +11964,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$select2DropdownDraw = F5(
 													'scroll',
 													_MadonnaMat$elm_select_two$SelectTwo_Html$scrollPosition(
 														function (_p10) {
-															return _p12(
+															return sender(
 																_MadonnaMat$elm_select_two$SelectTwo_Types$ResultScroll(_p10));
 														})),
 												_1: {ctor: '[]'}
@@ -12250,7 +11984,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$select2DropdownDraw = F5(
 											ctor: '::',
 											_0: _MadonnaMat$elm_select_two$SelectTwo_Html$noResultsFound(_p6.noResultsMessage),
 											_1: {ctor: '[]'}
-										} : A5(_MadonnaMat$elm_select_two$SelectTwo_Html$listOrGroup, _p12, _p6.defaults, theList, hovered, search)),
+										} : A6(_MadonnaMat$elm_select_two$SelectTwo_Html$listOrGroup, sender, _p6.defaults, theList, hovered, search, customHtml)),
 									_1: {ctor: '[]'}
 								}),
 							_1: {ctor: '[]'}
@@ -12259,28 +11993,22 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$select2DropdownDraw = F5(
 				_1: {ctor: '[]'}
 			});
 	});
-var _MadonnaMat$elm_select_two$SelectTwo_Html$select2Dropdown = function (model) {
-	var _p13 = model.selectTwo;
-	if (_p13.ctor === 'Just') {
-		return A5(_MadonnaMat$elm_select_two$SelectTwo_Html$select2DropdownDraw, _p13._0.dropdown, _p13._0.hovered, _p13._0.search, _p13._0.list, _p13._0.ajaxStuff);
-	} else {
-		return _elm_lang$html$Html$text('');
-	}
-};
+var _MadonnaMat$elm_select_two$SelectTwo_Html$select2Dropdown = F3(
+	function (sender, customHtml, model) {
+		var _p12 = model.selectTwo;
+		if (_p12.ctor === 'Just') {
+			return A7(_MadonnaMat$elm_select_two$SelectTwo_Html$select2DropdownDraw, sender, _p12._0.dropdown, _p12._0.hovered, _p12._0.search, _p12._0.list, _p12._0.ajaxParams, customHtml);
+		} else {
+			return _elm_lang$html$Html$text('');
+		}
+	});
 var _MadonnaMat$elm_select_two$SelectTwo_Html$multiSelectSpan = F8(
-	function (sender, id_, defaults, list, clearMsg, disabled, placeholder, url) {
-		var theList = function () {
-			var _p14 = url;
-			if (_p14.ctor === 'Just') {
-				return {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: '', _1: defaults},
-					_1: {ctor: '[]'}
-				};
-			} else {
-				return list;
-			}
-		}();
+	function (sender, id_, defaults, list, clearMsg, disabled, placeholder, ajax) {
+		var theList = ajax ? {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: '', _1: defaults},
+			_1: {ctor: '[]'}
+		} : list;
 		return A2(
 			_elm_lang$html$Html$span,
 			{
@@ -12301,8 +12029,8 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$multiSelectSpan = F8(
 						_elm_lang$core$Basics_ops['++'],
 						A2(
 							_elm_lang$core$List$map,
-							function (_p15) {
-								var _p16 = _p15;
+							function (_p13) {
+								var _p14 = _p13;
 								return A2(
 									_elm_lang$html$Html$li,
 									{
@@ -12313,8 +12041,8 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$multiSelectSpan = F8(
 									{
 										ctor: '::',
 										_0: function () {
-											var _p17 = clearMsg;
-											if (_p17.ctor === 'Just') {
+											var _p15 = clearMsg;
+											if (_p15.ctor === 'Just') {
 												return A2(
 													_elm_lang$html$Html$span,
 													{
@@ -12323,7 +12051,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$multiSelectSpan = F8(
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Events$onClick(
-																_p17._0(_p16._0)),
+																_p15._0(_p14._0)),
 															_1: {ctor: '[]'}
 														}
 													},
@@ -12338,7 +12066,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$multiSelectSpan = F8(
 										}(),
 										_1: {
 											ctor: '::',
-											_0: _p16._1,
+											_0: _elm_lang$html$Html$text(_p14._1),
 											_1: {ctor: '[]'}
 										}
 									});
@@ -12366,9 +12094,9 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$multiSelectSpan = F8(
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Events$onInput(
-													function (_p18) {
+													function (_p16) {
 														return sender(
-															_MadonnaMat$elm_select_two$SelectTwo_Types$SetSelectTwoSearch(_p18));
+															_MadonnaMat$elm_select_two$SelectTwo_Types$SetSelectTwoSearch(_p16));
 													}),
 												_1: {
 													ctor: '::',
@@ -12395,18 +12123,12 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$multiSelectSpan = F8(
 	});
 var _MadonnaMat$elm_select_two$SelectTwo_Html$singleSelectSpan = F3(
 	function ($default, clearMsg, placeholder) {
-		var _p19 = A2(
+		var _p17 = A2(
 			_elm_lang$core$Maybe$withDefault,
-			{
-				ctor: '_Tuple4',
-				_0: _elm_lang$core$Maybe$Nothing,
-				_1: _elm_lang$html$Html$text(''),
-				_2: '',
-				_3: false
-			},
+			{ctor: '_Tuple3', _0: _elm_lang$core$Maybe$Nothing, _1: '', _2: false},
 			$default);
-		var defaultMsg = _p19._0;
-		var defaultText = _p19._1;
+		var defaultMsg = _p17._0;
+		var defaultText = _p17._1;
 		return A2(
 			_elm_lang$html$Html$span,
 			{
@@ -12426,9 +12148,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$singleSelectSpan = F3(
 					{
 						ctor: '::',
 						_0: function () {
-							if (_elm_lang$core$Native_Utils.eq(
-								defaultText,
-								_elm_lang$html$Html$text(''))) {
+							if (_elm_lang$core$Native_Utils.eq(defaultText, '')) {
 								return A2(
 									_elm_lang$html$Html$span,
 									{
@@ -12442,8 +12162,8 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$singleSelectSpan = F3(
 										_1: {ctor: '[]'}
 									});
 							} else {
-								var _p20 = clearMsg;
-								if (_p20.ctor === 'Just') {
+								var _p18 = clearMsg;
+								if (_p18.ctor === 'Just') {
 									return A2(
 										_elm_lang$html$Html$span,
 										{
@@ -12452,7 +12172,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$singleSelectSpan = F3(
 											_1: {
 												ctor: '::',
 												_0: _elm_lang$html$Html_Events$onClick(
-													_p20._0(defaultMsg)),
+													_p18._0(defaultMsg)),
 												_1: {ctor: '[]'}
 											}
 										},
@@ -12468,7 +12188,7 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$singleSelectSpan = F3(
 						}(),
 						_1: {
 							ctor: '::',
-							_0: defaultText,
+							_0: _elm_lang$html$Html$text(defaultText),
 							_1: {ctor: '[]'}
 						}
 					}),
@@ -12494,20 +12214,16 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$singleSelectSpan = F3(
 			});
 	});
 var _MadonnaMat$elm_select_two$SelectTwo_Html$select2 = F2(
-	function (sender, _p21) {
-		var _p22 = _p21;
-		var _p35 = _p22.url;
-		var _p34 = _p22.showSearch;
-		var _p33 = _p22.placeholder;
-		var _p32 = _p22.parents;
-		var _p31 = _p22.noResultsMessage;
-		var _p30 = _p22.multiSelect;
-		var _p29 = _p22.list;
-		var _p28 = _p22.id_;
-		var _p27 = _p22.disabled;
-		var _p26 = _p22.delay;
-		var _p25 = _p22.defaults;
-		var _p24 = _p22.clearMsg;
+	function (sender, _p19) {
+		var _p20 = _p19;
+		var _p28 = _p20.placeholder;
+		var _p27 = _p20.multiSelect;
+		var _p26 = _p20.list;
+		var _p25 = _p20.id_;
+		var _p24 = _p20.disabled;
+		var _p23 = _p20.defaults;
+		var _p22 = _p20.clearMsg;
+		var _p21 = _p20.ajax;
 		return A2(
 			_elm_lang$html$Html$span,
 			{
@@ -12518,43 +12234,28 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$select2 = F2(
 						_0: {ctor: '_Tuple2', _0: 'select2 elm-select2 select2-container select2-container--default select2-container--below select2-container--focus', _1: true},
 						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'select2-container--disabled', _1: _p27},
+							_0: {ctor: '_Tuple2', _0: 'select2-container--disabled', _1: _p24},
 							_1: {ctor: '[]'}
 						}
 					}),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$id(_p28),
+					_0: _elm_lang$html$Html_Attributes$id(_p25),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Attributes$style(
 							{
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'width', _1: _p22.width},
+								_0: {ctor: '_Tuple2', _0: 'width', _1: _p20.width},
 								_1: {ctor: '[]'}
 							}),
 						_1: {
 							ctor: '::',
-							_0: function () {
-								if (!_p27) {
-									var _p23 = _p35;
-									if (_p23.ctor === 'Just') {
-										return A3(
-											_elm_lang$html$Html_Events$onWithOptions,
-											'click',
-											_MadonnaMat$elm_select_two$SelectTwo_Html$preventAndStop,
-											_MadonnaMat$elm_select_two$SelectTwo_Private$ajaxLocation(_p28)(_p26)(sender)(_p25)(_p32)(_p34 && (!_p30))(_p31)(_p23._0)(_p22.data)(_p22.processResults));
-									} else {
-										return A3(
-											_elm_lang$html$Html_Events$onWithOptions,
-											'click',
-											_MadonnaMat$elm_select_two$SelectTwo_Html$preventAndStop,
-											A8(_MadonnaMat$elm_select_two$SelectTwo_Private$location, _p28, _p26, sender, _p25, _p29, _p32, _p34 && (!_p30), _p31));
-									}
-								} else {
-									return A2(_elm_lang$html$Html_Attributes$attribute, 'data-blank', '');
-								}
-							}(),
+							_0: (!_p24) ? A3(
+								_elm_lang$html$Html_Events$onWithOptions,
+								'click',
+								_MadonnaMat$elm_select_two$SelectTwo_Html$preventAndStop,
+								A9(_MadonnaMat$elm_select_two$SelectTwo_Private$location, _p25, sender, _p23, _p26, _p20.parents, _p20.showSearch && (!_p27), _p20.noResultsMessage, _p21, _p20.delay)) : A2(_elm_lang$html$Html_Attributes$attribute, 'data-blank', ''),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -12571,11 +12272,11 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$select2 = F2(
 					},
 					{
 						ctor: '::',
-						_0: _p30 ? A8(_MadonnaMat$elm_select_two$SelectTwo_Html$multiSelectSpan, sender, _p28, _p25, _p29, _p24, _p27, _p33, _p35) : A3(
+						_0: _p27 ? A8(_MadonnaMat$elm_select_two$SelectTwo_Html$multiSelectSpan, sender, _p25, _p23, _p26, _p22, _p24, _p28, _p21) : A3(
 							_MadonnaMat$elm_select_two$SelectTwo_Html$singleSelectSpan,
-							_elm_lang$core$List$head(_p25),
-							_p24,
-							_p33),
+							_elm_lang$core$List$head(_p23),
+							_p22,
+							_p28),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
@@ -12599,6 +12300,40 @@ var _MadonnaMat$elm_select_two$SelectTwo_Html$select2Css = A3(
 		}
 	},
 	{ctor: '[]'});
+var _MadonnaMat$elm_select_two$Main$customHtml = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1._0;
+	if ((_p2.ctor === 'Just') && (_p2._0.ctor === 'Test3')) {
+		return _elm_lang$core$Maybe$Just(
+			A2(
+				_elm_lang$html$Html$span,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'text-align', _1: 'center'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+									_1: {ctor: '[]'}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(_p1._1),
+					_1: {ctor: '[]'}
+				}));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
 var _MadonnaMat$elm_select_two$Main$testList3 = function (msg) {
 	return {
 		ctor: '::',
@@ -12607,40 +12342,14 @@ var _MadonnaMat$elm_select_two$Main$testList3 = function (msg) {
 			_0: '',
 			_1: A2(
 				_elm_lang$core$List$map,
-				function (_p0) {
-					var _p1 = _p0;
-					var _p2 = _p1._1;
+				function (_p3) {
+					var _p4 = _p3;
 					return {
-						ctor: '_Tuple4',
+						ctor: '_Tuple3',
 						_0: _elm_lang$core$Maybe$Just(
-							msg(_p1._0)),
-						_1: A2(
-							_elm_lang$html$Html$span,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$style(
-									{
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
-										_1: {
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'text-align', _1: 'center'},
-											_1: {
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
-												_1: {ctor: '[]'}
-											}
-										}
-									}),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(_p2),
-								_1: {ctor: '[]'}
-							}),
-						_2: _p2,
-						_3: true
+							msg(_p4._0)),
+						_1: _p4._1,
+						_2: true
 					};
 				},
 				{
@@ -12770,103 +12479,12 @@ var _MadonnaMat$elm_select_two$Main$testList = function (msg) {
 var _MadonnaMat$elm_select_two$Main$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
-var _MadonnaMat$elm_select_two$Main$update = F2(
-	function (msg, model) {
-		var _p3 = msg;
-		switch (_p3.ctor) {
-			case 'SelectTwo':
-				return A2(_MadonnaMat$elm_select_two$SelectTwo$update, _p3._0, model);
-			case 'Test':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{test: _p3._0}),
-					{ctor: '[]'});
-			case 'Test2':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{test2: _p3._0}),
-					{ctor: '[]'});
-			case 'Test3':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							test3: {ctor: '::', _0: _p3._0, _1: model.test3}
-						}),
-					{ctor: '[]'});
-			case 'Test4':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{test4: _p3._0}),
-					{ctor: '[]'});
-			case 'Test5':
-				if (_p3._0.ctor === 'Just') {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								test5: {ctor: '::', _0: _p3._0._0, _1: model.test5}
-							}),
-						{ctor: '[]'});
-				} else {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						model,
-						{ctor: '[]'});
-				}
-			case 'Test3Clear':
-				if ((_p3._0.ctor === 'Just') && (_p3._0._0.ctor === 'Test3')) {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								test3: A2(
-									_elm_lang$core$List$filter,
-									F2(
-										function (x, y) {
-											return !_elm_lang$core$Native_Utils.eq(x, y);
-										})(_p3._0._0._0),
-									model.test3)
-							}),
-						{ctor: '[]'});
-				} else {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						model,
-						{ctor: '[]'});
-				}
-			default:
-				if (((_p3._0.ctor === 'Just') && (_p3._0._0.ctor === 'Test5')) && (_p3._0._0._0.ctor === 'Just')) {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								test5: A2(
-									_elm_lang$core$List$filter,
-									F2(
-										function (x, y) {
-											return !_elm_lang$core$Native_Utils.eq(x, y);
-										})(_p3._0._0._0._0),
-									model.test5)
-							}),
-						{ctor: '[]'});
-				} else {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						model,
-						{ctor: '[]'});
-				}
-		}
+var _MadonnaMat$elm_select_two$Main$sendAjax = F2(
+	function (url, msg) {
+		return A2(
+			_elm_lang$http$Http$send,
+			msg,
+			_elm_lang$http$Http$getString(url));
 	});
 var _MadonnaMat$elm_select_two$Main$init = A2(
 	_elm_lang$core$Platform_Cmd_ops['!'],
@@ -12892,24 +12510,22 @@ var _MadonnaMat$elm_select_two$Main$itemsDecoder = A3(
 	_MadonnaMat$elm_select_two$Main$Item,
 	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$int),
 	A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string));
-var _MadonnaMat$elm_select_two$Main$processResult = F2(
-	function (msg, _p4) {
-		var _p5 = _p4;
-		var _p8 = _p5._1;
+var _MadonnaMat$elm_select_two$Main$processResult = F3(
+	function (msg, string, params) {
 		return A2(
 			_elm_lang$core$Maybe$withDefault,
 			{
 				ctor: '_Tuple2',
 				_0: {ctor: '[]'},
-				_1: _p8
+				_1: params
 			},
 			_elm_lang$core$Result$toMaybe(
 				A2(
 					_elm_lang$core$Json_Decode$decodeString,
 					A2(
 						_elm_lang$core$Json_Decode$map,
-						function (_p6) {
-							var _p7 = _p6;
+						function (_p5) {
+							var _p6 = _p5;
 							return {
 								ctor: '_Tuple2',
 								_0: A2(
@@ -12924,11 +12540,11 @@ var _MadonnaMat$elm_select_two$Main$processResult = F2(
 												_1: i.name
 											};
 										},
-										_p7._0)),
+										_p6._0)),
 								_1: _elm_lang$core$Native_Utils.update(
-									_p8,
+									params,
 									{
-										more: _elm_lang$core$Native_Utils.cmp(_p8.page * 30, _p7._1) < 0
+										more: _elm_lang$core$Native_Utils.cmp(params.page * 30, _p6._1) < 0
 									})
 							};
 						},
@@ -12947,7 +12563,23 @@ var _MadonnaMat$elm_select_two$Main$processResult = F2(
 								},
 								_elm_lang$core$Json_Decode$list(_MadonnaMat$elm_select_two$Main$itemsDecoder)),
 							A2(_elm_lang$core$Json_Decode$field, 'total_count', _elm_lang$core$Json_Decode$int))),
-					_p5._0)));
+					string)));
+	});
+var _MadonnaMat$elm_select_two$Main$Test5Res = F2(
+	function (a, b) {
+		return {ctor: 'Test5Res', _0: a, _1: b};
+	});
+var _MadonnaMat$elm_select_two$Main$Test5Ajax = F2(
+	function (a, b) {
+		return {ctor: 'Test5Ajax', _0: a, _1: b};
+	});
+var _MadonnaMat$elm_select_two$Main$Test4Res = F2(
+	function (a, b) {
+		return {ctor: 'Test4Res', _0: a, _1: b};
+	});
+var _MadonnaMat$elm_select_two$Main$Test4Ajax = F2(
+	function (a, b) {
+		return {ctor: 'Test4Ajax', _0: a, _1: b};
 	});
 var _MadonnaMat$elm_select_two$Main$Test5Clear = function (a) {
 	return {ctor: 'Test5Clear', _0: a};
@@ -12964,6 +12596,226 @@ var _MadonnaMat$elm_select_two$Main$Test5 = function (a) {
 var _MadonnaMat$elm_select_two$Main$Test4 = function (a) {
 	return {ctor: 'Test4', _0: a};
 };
+var _MadonnaMat$elm_select_two$Main$update = F2(
+	function (msg, model) {
+		var _p7 = msg;
+		switch (_p7.ctor) {
+			case 'SelectTwo':
+				var ajaxCases = _elm_lang$core$Maybe$Just(
+					F3(
+						function (id_, params, reset) {
+							var _p8 = id_;
+							switch (_p8) {
+								case 'test-4':
+									return A2(
+										_elm_lang$core$Platform_Cmd_ops['!'],
+										model,
+										{
+											ctor: '::',
+											_0: _MadonnaMat$elm_select_two$SelectTwo$send(
+												A2(_MadonnaMat$elm_select_two$Main$Test4Ajax, params, reset)),
+											_1: {ctor: '[]'}
+										});
+								case 'test-5':
+									return A2(
+										_elm_lang$core$Platform_Cmd_ops['!'],
+										model,
+										{
+											ctor: '::',
+											_0: _MadonnaMat$elm_select_two$SelectTwo$send(
+												A2(_MadonnaMat$elm_select_two$Main$Test5Ajax, params, reset)),
+											_1: {ctor: '[]'}
+										});
+								default:
+									return A2(
+										_elm_lang$core$Platform_Cmd_ops['!'],
+										model,
+										{ctor: '[]'});
+							}
+						}));
+				return A4(_MadonnaMat$elm_select_two$SelectTwo$update, _MadonnaMat$elm_select_two$Main$SelectTwo, _p7._0, ajaxCases, model);
+			case 'Test':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{test: _p7._0}),
+					{ctor: '[]'});
+			case 'Test2':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{test2: _p7._0}),
+					{ctor: '[]'});
+			case 'Test3':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							test3: {ctor: '::', _0: _p7._0, _1: model.test3}
+						}),
+					{ctor: '[]'});
+			case 'Test4':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{test4: _p7._0}),
+					{ctor: '[]'});
+			case 'Test5':
+				if (_p7._0.ctor === 'Just') {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								test5: {ctor: '::', _0: _p7._0._0, _1: model.test5}
+							}),
+						{ctor: '[]'});
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						model,
+						{ctor: '[]'});
+				}
+			case 'Test3Clear':
+				if ((_p7._0.ctor === 'Just') && (_p7._0._0.ctor === 'Test3')) {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								test3: A2(
+									_elm_lang$core$List$filter,
+									F2(
+										function (x, y) {
+											return !_elm_lang$core$Native_Utils.eq(x, y);
+										})(_p7._0._0._0),
+									model.test3)
+							}),
+						{ctor: '[]'});
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						model,
+						{ctor: '[]'});
+				}
+			case 'Test5Clear':
+				if (((_p7._0.ctor === 'Just') && (_p7._0._0.ctor === 'Test5')) && (_p7._0._0._0.ctor === 'Just')) {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								test5: A2(
+									_elm_lang$core$List$filter,
+									F2(
+										function (x, y) {
+											return !_elm_lang$core$Native_Utils.eq(x, y);
+										})(_p7._0._0._0._0),
+									model.test5)
+							}),
+						{ctor: '[]'});
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						model,
+						{ctor: '[]'});
+				}
+			case 'Test4Ajax':
+				var _p9 = _p7._0;
+				var url = '//api.github.com/search/repositories';
+				var buildUrl = function () {
+					var term = _elm_lang$core$Native_Utils.eq(_p9.term, '') ? 'test' : _p9.term;
+					return A2(
+						_elm_lang$core$Basics_ops['++'],
+						url,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'?q=',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								term,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'&page=',
+									_elm_lang$core$Basics$toString(_p9.page)))));
+				}();
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					A3(_MadonnaMat$elm_select_two$SelectTwo$setLoading, _p9, _p7._1, model),
+					{
+						ctor: '::',
+						_0: A2(
+							_MadonnaMat$elm_select_two$Main$sendAjax,
+							buildUrl,
+							_MadonnaMat$elm_select_two$Main$Test4Res(_p9)),
+						_1: {ctor: '[]'}
+					});
+			case 'Test4Res':
+				if (_p7._1.ctor === 'Ok') {
+					var _p10 = A3(_MadonnaMat$elm_select_two$Main$processResult, _MadonnaMat$elm_select_two$Main$Test4, _p7._1._0, _p7._0);
+					var list = _p10._0;
+					var newParams = _p10._1;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						A3(_MadonnaMat$elm_select_two$SelectTwo$setList, list, newParams, model),
+						{ctor: '[]'});
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						model,
+						{ctor: '[]'});
+				}
+			case 'Test5Ajax':
+				var _p11 = _p7._0;
+				var url = '//api.github.com/search/repositories';
+				var buildUrl = function () {
+					var term = _elm_lang$core$Native_Utils.eq(_p11.term, '') ? 'test' : _p11.term;
+					return A2(
+						_elm_lang$core$Basics_ops['++'],
+						url,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'?q=',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								term,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'&page=',
+									_elm_lang$core$Basics$toString(_p11.page)))));
+				}();
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					A3(_MadonnaMat$elm_select_two$SelectTwo$setLoading, _p11, _p7._1, model),
+					{
+						ctor: '::',
+						_0: A2(
+							_MadonnaMat$elm_select_two$Main$sendAjax,
+							buildUrl,
+							_MadonnaMat$elm_select_two$Main$Test5Res(_p11)),
+						_1: {ctor: '[]'}
+					});
+			default:
+				if (_p7._1.ctor === 'Ok') {
+					var _p12 = A3(_MadonnaMat$elm_select_two$Main$processResult, _MadonnaMat$elm_select_two$Main$Test5, _p7._1._0, _p7._0);
+					var list = _p12._0;
+					var newParams = _p12._1;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						A3(_MadonnaMat$elm_select_two$SelectTwo$setList, list, newParams, model),
+						{ctor: '[]'});
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						model,
+						{ctor: '[]'});
+				}
+		}
+	});
 var _MadonnaMat$elm_select_two$Main$Test3 = function (a) {
 	return {ctor: 'Test3', _0: a};
 };
@@ -13035,25 +12887,18 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 											_MadonnaMat$elm_select_two$Main$SelectTwo,
 											{
 												defaults: A2(
-													_elm_lang$core$List$filter,
-													function (l) {
-														return _elm_lang$core$Native_Utils.eq(
-															_elm_lang$core$Maybe$Just(
-																_MadonnaMat$elm_select_two$Main$Test(model.test)),
-															_Fresheyeball$elm_tuple_extra$Tuple4$first(l));
+													_MadonnaMat$elm_select_two$SelectTwo$defaultsFromList,
+													{
+														ctor: '::',
+														_0: _MadonnaMat$elm_select_two$Main$Test(model.test),
+														_1: {ctor: '[]'}
 													},
-													A2(
-														_elm_lang$core$List$concatMap,
-														function (_p9) {
-															var _p10 = _p9;
-															return _p10._1;
-														},
-														_MadonnaMat$elm_select_two$Main$testList(_MadonnaMat$elm_select_two$Main$Test))),
+													_MadonnaMat$elm_select_two$Main$testList(_MadonnaMat$elm_select_two$Main$Test)),
 												id_: 'test-1',
 												list: _MadonnaMat$elm_select_two$Main$testList(_MadonnaMat$elm_select_two$Main$Test),
 												parents: {ctor: '[]'},
 												clearMsg: _elm_lang$core$Maybe$Just(
-													function (_p11) {
+													function (_p13) {
 														return _MadonnaMat$elm_select_two$Main$Test(_elm_lang$core$Maybe$Nothing);
 													}),
 												width: A2(
@@ -13066,18 +12911,7 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 													_elm_lang$core$Maybe$Just('a')),
 												showSearch: true,
 												multiSelect: false,
-												url: _elm_lang$core$Maybe$Nothing,
-												data: function (_p12) {
-													return '';
-												},
-												processResults: function (_p13) {
-													var _p14 = _p13;
-													return {
-														ctor: '_Tuple2',
-														_0: {ctor: '[]'},
-														_1: _p14._1
-													};
-												},
+												ajax: false,
 												delay: 0,
 												noResultsMessage: _elm_lang$core$Maybe$Nothing
 											}),
@@ -13119,20 +12953,13 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 												_MadonnaMat$elm_select_two$Main$SelectTwo,
 												{
 													defaults: A2(
-														_elm_lang$core$List$filter,
-														function (l) {
-															return _elm_lang$core$Native_Utils.eq(
-																_elm_lang$core$Maybe$Just(
-																	_MadonnaMat$elm_select_two$Main$Test2(model.test2)),
-																_Fresheyeball$elm_tuple_extra$Tuple4$first(l));
+														_MadonnaMat$elm_select_two$SelectTwo$defaultsFromList,
+														{
+															ctor: '::',
+															_0: _MadonnaMat$elm_select_two$Main$Test2(model.test2),
+															_1: {ctor: '[]'}
 														},
-														A2(
-															_elm_lang$core$List$concatMap,
-															function (_p15) {
-																var _p16 = _p15;
-																return _p16._1;
-															},
-															_MadonnaMat$elm_select_two$Main$testList2(_MadonnaMat$elm_select_two$Main$Test2))),
+														_MadonnaMat$elm_select_two$Main$testList2(_MadonnaMat$elm_select_two$Main$Test2)),
 													id_: 'test-2',
 													list: _MadonnaMat$elm_select_two$Main$testList2(_MadonnaMat$elm_select_two$Main$Test2),
 													parents: {
@@ -13141,7 +12968,7 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 														_1: {ctor: '[]'}
 													},
 													clearMsg: _elm_lang$core$Maybe$Just(
-														function (_p17) {
+														function (_p14) {
 															return _MadonnaMat$elm_select_two$Main$Test2(_elm_lang$core$Maybe$Nothing);
 														}),
 													width: '300px',
@@ -13149,18 +12976,7 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 													disabled: false,
 													showSearch: true,
 													multiSelect: false,
-													url: _elm_lang$core$Maybe$Nothing,
-													data: function (_p18) {
-														return '';
-													},
-													processResults: function (_p19) {
-														var _p20 = _p19;
-														return {
-															ctor: '_Tuple2',
-															_0: {ctor: '[]'},
-															_1: _p20._1
-														};
-													},
+													ajax: false,
 													delay: 0,
 													noResultsMessage: _elm_lang$core$Maybe$Nothing
 												}),
@@ -13210,26 +13026,9 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 													_MadonnaMat$elm_select_two$Main$SelectTwo,
 													{
 														defaults: A2(
-															_elm_lang$core$List$filter,
-															function (l) {
-																return A2(
-																	_elm_lang$core$List$member,
-																	_Fresheyeball$elm_tuple_extra$Tuple4$first(l),
-																	A2(
-																		_elm_lang$core$List$map,
-																		function (_p21) {
-																			return _elm_lang$core$Maybe$Just(
-																				_MadonnaMat$elm_select_two$Main$Test3(_p21));
-																		},
-																		model.test3));
-															},
-															A2(
-																_elm_lang$core$List$concatMap,
-																function (_p22) {
-																	var _p23 = _p22;
-																	return _p23._1;
-																},
-																_MadonnaMat$elm_select_two$Main$testList3(_MadonnaMat$elm_select_two$Main$Test3))),
+															_MadonnaMat$elm_select_two$SelectTwo$defaultsFromList,
+															A2(_elm_lang$core$List$map, _MadonnaMat$elm_select_two$Main$Test3, model.test3),
+															_MadonnaMat$elm_select_two$Main$testList3(_MadonnaMat$elm_select_two$Main$Test3)),
 														id_: 'test-3',
 														list: _MadonnaMat$elm_select_two$Main$testList3(_MadonnaMat$elm_select_two$Main$Test3),
 														parents: {
@@ -13245,18 +13044,7 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 															_elm_lang$core$Maybe$Just('a')),
 														showSearch: false,
 														multiSelect: true,
-														url: _elm_lang$core$Maybe$Nothing,
-														data: function (_p24) {
-															return '';
-														},
-														processResults: function (_p25) {
-															var _p26 = _p25;
-															return {
-																ctor: '_Tuple2',
-																_0: {ctor: '[]'},
-																_1: _p26._1
-															};
-														},
+														ajax: false,
 														delay: 0,
 														noResultsMessage: _elm_lang$core$Maybe$Nothing
 													}),
@@ -13288,53 +13076,28 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 																ctor: '::',
 																_0: A2(
 																	_elm_lang$core$Maybe$withDefault,
-																	{
-																		ctor: '_Tuple4',
-																		_0: _elm_lang$core$Maybe$Nothing,
-																		_1: _elm_lang$html$Html$text(''),
-																		_2: '',
-																		_3: true
-																	},
+																	{ctor: '_Tuple3', _0: _elm_lang$core$Maybe$Nothing, _1: '', _2: true},
 																	A2(
 																		_elm_lang$core$Maybe$map,
 																		function (t) {
 																			return {
-																				ctor: '_Tuple4',
+																				ctor: '_Tuple3',
 																				_0: _elm_lang$core$Maybe$Just(
 																					_MadonnaMat$elm_select_two$Main$Test4(
 																						_elm_lang$core$Maybe$Just(t))),
-																				_1: _elm_lang$html$Html$text(t.name),
-																				_2: t.name,
-																				_3: true
+																				_1: t.name,
+																				_2: true
 																			};
 																		},
 																		model.test4)),
 																_1: {ctor: '[]'}
 															},
-															url: _elm_lang$core$Maybe$Just('//api.github.com/search/repositories'),
-															data: function (_p27) {
-																var _p28 = _p27;
-																var _p29 = _p28._1;
-																var term = _elm_lang$core$Native_Utils.eq(_p29.term, '') ? 'test' : _p29.term;
-																return A2(
-																	_elm_lang$core$Basics_ops['++'],
-																	_p28._0,
-																	A2(
-																		_elm_lang$core$Basics_ops['++'],
-																		'?q=',
-																		A2(
-																			_elm_lang$core$Basics_ops['++'],
-																			term,
-																			A2(
-																				_elm_lang$core$Basics_ops['++'],
-																				'&page=',
-																				_elm_lang$core$Basics$toString(_p29.page)))));
-															},
-															processResults: _MadonnaMat$elm_select_two$Main$processResult(_MadonnaMat$elm_select_two$Main$Test4),
+															ajax: true,
+															delay: 300,
 															id_: 'test-4',
 															parents: {ctor: '[]'},
 															clearMsg: _elm_lang$core$Maybe$Just(
-																function (_p30) {
+																function (_p15) {
 																	return _MadonnaMat$elm_select_two$Main$Test4(_elm_lang$core$Maybe$Nothing);
 																}),
 															showSearch: true,
@@ -13345,7 +13108,6 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 															disabled: _elm_lang$core$Native_Utils.eq(
 																model.test2,
 																_elm_lang$core$Maybe$Just('a')),
-															delay: 300,
 															noResultsMessage: _elm_lang$core$Maybe$Just('YOU GET NOTHING! YOU LOSE GOODDAY SIR!')
 														}),
 													_1: {ctor: '[]'}
@@ -13376,36 +13138,17 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 																	_elm_lang$core$List$map,
 																	function (t) {
 																		return {
-																			ctor: '_Tuple4',
+																			ctor: '_Tuple3',
 																			_0: _elm_lang$core$Maybe$Just(
 																				_MadonnaMat$elm_select_two$Main$Test5(
 																					_elm_lang$core$Maybe$Just(t))),
-																			_1: _elm_lang$html$Html$text(t.name),
-																			_2: t.name,
-																			_3: true
+																			_1: t.name,
+																			_2: true
 																		};
 																	},
 																	model.test5),
-																url: _elm_lang$core$Maybe$Just('//api.github.com/search/repositories'),
-																data: function (_p31) {
-																	var _p32 = _p31;
-																	var _p33 = _p32._1;
-																	var term = _elm_lang$core$Native_Utils.eq(_p33.term, '') ? 'test' : _p33.term;
-																	return A2(
-																		_elm_lang$core$Basics_ops['++'],
-																		_p32._0,
-																		A2(
-																			_elm_lang$core$Basics_ops['++'],
-																			'?q=',
-																			A2(
-																				_elm_lang$core$Basics_ops['++'],
-																				term,
-																				A2(
-																					_elm_lang$core$Basics_ops['++'],
-																					'&page=',
-																					_elm_lang$core$Basics$toString(_p33.page)))));
-																},
-																processResults: _MadonnaMat$elm_select_two$Main$processResult(_MadonnaMat$elm_select_two$Main$Test5),
+																ajax: true,
+																delay: 300,
 																id_: 'test-5',
 																parents: {ctor: '[]'},
 																clearMsg: _elm_lang$core$Maybe$Just(_MadonnaMat$elm_select_two$Main$Test5Clear),
@@ -13417,7 +13160,6 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 																disabled: _elm_lang$core$Native_Utils.eq(
 																	model.test2,
 																	_elm_lang$core$Maybe$Just('a')),
-																delay: 300,
 																noResultsMessage: _elm_lang$core$Maybe$Nothing
 															}),
 														_1: {ctor: '[]'}
@@ -13427,7 +13169,11 @@ var _MadonnaMat$elm_select_two$Main$view = function (model) {
 										}),
 									_1: {
 										ctor: '::',
-										_0: _MadonnaMat$elm_select_two$SelectTwo_Html$select2Dropdown(model),
+										_0: A3(
+											_MadonnaMat$elm_select_two$SelectTwo_Html$select2Dropdown,
+											_MadonnaMat$elm_select_two$Main$SelectTwo,
+											_elm_lang$core$Maybe$Just(_MadonnaMat$elm_select_two$Main$customHtml),
+											model),
 										_1: {ctor: '[]'}
 									}
 								}

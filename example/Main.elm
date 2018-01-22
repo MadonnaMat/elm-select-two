@@ -7,8 +7,9 @@ import SelectTwo exposing (..)
 import SelectTwo.Html exposing (..)
 import SelectTwo.Types exposing (..)
 import Task
-import Tuple4
+import Tuple3
 import Json.Decode as JD
+import Http
 
 
 type alias Model =
@@ -42,13 +43,32 @@ type Msg
     | SelectTwo (SelectTwoMsg Msg)
     | Test3Clear (Maybe Msg)
     | Test5Clear (Maybe Msg)
+    | Test4Ajax AjaxParams Bool
+    | Test4Res AjaxParams (Result Http.Error String)
+    | Test5Ajax AjaxParams Bool
+    | Test5Res AjaxParams (Result Http.Error String)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SelectTwo stmsg ->
-            SelectTwo.update stmsg model
+            let
+                ajaxCases =
+                    Just
+                        (\id_ params reset ->
+                            case id_ of
+                                "test-4" ->
+                                    model ! [ SelectTwo.send <| Test4Ajax params reset ]
+
+                                "test-5" ->
+                                    model ! [ SelectTwo.send <| Test5Ajax params reset ]
+
+                                _ ->
+                                    model ! []
+                        )
+            in
+                SelectTwo.update (SelectTwo) stmsg ajaxCases model
 
         Test s ->
             { model | test = s } ! []
@@ -79,6 +99,66 @@ update msg model =
 
         Test5Clear _ ->
             model ! []
+
+        Test4Ajax params reset ->
+            let
+                url =
+                    "//api.github.com/search/repositories"
+
+                buildUrl =
+                    let
+                        term =
+                            if params.term == "" then
+                                "test"
+                            else
+                                params.term
+                    in
+                        (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
+            in
+                SelectTwo.setLoading params reset model ! [ sendAjax buildUrl (Test4Res params) ]
+
+        Test4Res params (Ok str) ->
+            let
+                ( list, newParams ) =
+                    processResult Test4 str params
+            in
+                SelectTwo.setList list newParams model ! []
+
+        Test4Res params (Err _) ->
+            model ! []
+
+        Test5Ajax params reset ->
+            let
+                url =
+                    "//api.github.com/search/repositories"
+
+                buildUrl =
+                    let
+                        term =
+                            if params.term == "" then
+                                "test"
+                            else
+                                params.term
+                    in
+                        (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
+            in
+                SelectTwo.setLoading params reset model ! [ sendAjax buildUrl (Test5Res params) ]
+
+        Test5Res params (Ok str) ->
+            let
+                ( list, newParams ) =
+                    processResult Test5 str params
+            in
+                SelectTwo.setList list newParams model ! []
+
+        Test5Res params (Err _) ->
+            model ! []
+
+
+sendAjax : String -> (Result Http.Error String -> Msg) -> Cmd Msg
+sendAjax url msg =
+    Http.getString url
+        |> Http.send msg
 
 
 main : Program Never Model Msg
@@ -113,10 +193,7 @@ view model =
             [ text "Single Group, Single Select, Width Guess'd"
             , div []
                 [ select2 SelectTwo
-                    { defaults =
-                        (testList Test)
-                            |> List.concatMap (\( _, l ) -> l)
-                            |> List.filter (\l -> (Just (Test model.test)) == (l |> Tuple4.first))
+                    { defaults = SelectTwo.defaultsFromList [ Test model.test ] <| testList Test
                     , id_ = "test-1"
                     , list = testList Test
                     , parents = []
@@ -126,9 +203,7 @@ view model =
                     , disabled = model.test2 == Just "a"
                     , showSearch = True
                     , multiSelect = False
-                    , url = Nothing
-                    , data = (\_ -> "")
-                    , processResults = (\( _, params ) -> ( [], params ))
+                    , ajax = False
                     , delay = 0
                     , noResultsMessage = Nothing
                     }
@@ -138,10 +213,7 @@ view model =
             [ text "Multiple Groups, Single Select, Relative Parent"
             , div []
                 [ select2 SelectTwo
-                    { defaults =
-                        (testList2 Test2)
-                            |> List.concatMap (\( _, l ) -> l)
-                            |> List.filter (\l -> (Just (Test2 model.test2)) == (l |> Tuple4.first))
+                    { defaults = SelectTwo.defaultsFromList [ Test2 model.test2 ] <| testList2 Test2
                     , id_ = "test-2"
                     , list = testList2 Test2
                     , parents = [ "p1" ]
@@ -151,9 +223,7 @@ view model =
                     , disabled = False
                     , showSearch = True
                     , multiSelect = False
-                    , url = Nothing
-                    , data = (\_ -> "")
-                    , processResults = (\( _, params ) -> ( [], params ))
+                    , ajax = False
                     , delay = 0
                     , noResultsMessage = Nothing
                     }
@@ -170,10 +240,7 @@ view model =
             [ text "Single Group, Multi-Select, Custom Rows, Position Absolute"
             , div []
                 [ select2 SelectTwo
-                    { defaults =
-                        (testList3 Test3)
-                            |> List.concatMap (\( _, l ) -> l)
-                            |> List.filter (\l -> model.test3 |> List.map (Test3 >> Just) |> List.member (l |> Tuple4.first))
+                    { defaults = SelectTwo.defaultsFromList (model.test3 |> List.map Test3) <| testList3 Test3
                     , id_ = "test-3"
                     , list = testList3 Test3
                     , parents = [ "p2" ]
@@ -183,9 +250,7 @@ view model =
                     , disabled = model.test2 == Just "a"
                     , showSearch = False
                     , multiSelect = True
-                    , url = Nothing
-                    , data = (\_ -> "")
-                    , processResults = (\( _, params ) -> ( [], params ))
+                    , ajax = False
                     , delay = 0
                     , noResultsMessage = Nothing
                     }
@@ -195,20 +260,9 @@ view model =
             [ text "Ajax, Single Select"
             , div []
                 [ select2 SelectTwo
-                    { defaults = [ model.test4 |> Maybe.map (\t -> ( Just (Test4 (Just t)), text t.name, t.name, True )) |> Maybe.withDefault ( Nothing, text "", "", True ) ]
-                    , url = Just "//api.github.com/search/repositories"
-                    , data =
-                        (\( url, params ) ->
-                            let
-                                term =
-                                    if params.term == "" then
-                                        "test"
-                                    else
-                                        params.term
-                            in
-                                (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
-                        )
-                    , processResults = processResult Test4
+                    { defaults = [ model.test4 |> Maybe.map (\t -> ( Just (Test4 (Just t)), t.name, True )) |> Maybe.withDefault ( Nothing, "", True ) ]
+                    , ajax = True
+                    , delay = 300
                     , id_ = "test-4"
                     , parents = []
                     , clearMsg = Just (\_ -> Test4 Nothing)
@@ -218,7 +272,6 @@ view model =
                     , list = []
                     , multiSelect = False
                     , disabled = model.test2 == Just "a"
-                    , delay = 300
                     , noResultsMessage = Just "YOU GET NOTHING! YOU LOSE GOODDAY SIR!"
                     }
                 ]
@@ -227,20 +280,9 @@ view model =
             [ text "Ajax, Multi Select"
             , div []
                 [ select2 SelectTwo
-                    { defaults = model.test5 |> List.map (\t -> ( Just (Test5 (Just t)), text t.name, t.name, True ))
-                    , url = Just "//api.github.com/search/repositories"
-                    , data =
-                        (\( url, params ) ->
-                            let
-                                term =
-                                    if params.term == "" then
-                                        "test"
-                                    else
-                                        params.term
-                            in
-                                (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
-                        )
-                    , processResults = processResult Test5
+                    { defaults = model.test5 |> List.map (\t -> ( Just (Test5 (Just t)), t.name, True ))
+                    , ajax = True
+                    , delay = 300
                     , id_ = "test-5"
                     , parents = []
                     , clearMsg = Just Test5Clear
@@ -250,17 +292,16 @@ view model =
                     , list = []
                     , multiSelect = True
                     , disabled = model.test2 == Just "a"
-                    , delay = 300
                     , noResultsMessage = Nothing
                     }
                 ]
             ]
-        , select2Dropdown model
+        , select2Dropdown SelectTwo (Just customHtml) model
         ]
 
 
-processResult : (Maybe { id : Int, name : String } -> Msg) -> ( String, AjaxParams ) -> ( List (GroupSelectTwoOption Msg), AjaxParams )
-processResult msg ( string, params ) =
+processResult : (Maybe { id : Int, name : String } -> Msg) -> String -> AjaxParams -> ( List (GroupSelectTwoOption Msg), AjaxParams )
+processResult msg string params =
     (JD.decodeString
         ((JD.map2 (,)
             (JD.at [ "items" ] (JD.list itemsDecoder))
@@ -318,18 +359,28 @@ testList3 msg =
         |> List.map
             (\( a, b ) ->
                 ( Just (msg a)
-                , span
-                    [ style
-                        [ ( "width", "100%" )
-                        , ( "text-align", "center" )
-                        , ( "display", "inline-block" )
-                        ]
-                    ]
-                    [ text b
-                    ]
                 , b
                 , True
                 )
             )
     )
         :: []
+
+
+customHtml : SelectTwoOption Msg -> Maybe (Html Msg)
+customHtml ( msg, txt, sel ) =
+    case msg of
+        Just (Test3 _) ->
+            Just <|
+                span
+                    [ style
+                        [ ( "width", "100%" )
+                        , ( "text-align", "center" )
+                        , ( "display", "inline-block" )
+                        ]
+                    ]
+                    [ text txt
+                    ]
+
+        _ ->
+            Nothing

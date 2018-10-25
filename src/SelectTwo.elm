@@ -60,13 +60,25 @@ import Tuple
 update : (SelectTwoMsg msg -> msg) -> SelectTwoMsg msg -> Maybe (String -> AjaxParams -> Bool -> ( Model b msg, Cmd msg )) -> Model b msg -> ( Model b msg, Cmd msg )
 update sender msg maybeAjax model =
     case msg of
-        SelectTwoTrigger p dd ->
+        SelectTwoTrigger dd ->
             let
                 newModel =
-                    new p dd model
+                    new dd model
             in
             ( newModel
-            , Cmd.batch [ Dom.focus (dd.id_ ++ "--search") |> Task.attempt (STRes >> sender), ajaxCmd sender (newModel.selectTwo |> Maybe.andThen .ajaxParams |> Maybe.withDefault (defaultParams "")) False (map (\s -> { s | list = [] }) newModel) ]
+            , Dom.getElement dd.id_ |> Task.attempt (SelectTwoOpen dd >> sender)
+            )
+
+        SelectTwoOpen dd (Ok elem) ->
+            let
+                newModel =
+                    updateDropdown elem model
+            in
+            ( newModel, Cmd.batch [ Dom.focus (dd.id_ ++ "--search") |> Task.attempt (STRes >> sender), ajaxCmd sender (newModel.selectTwo |> Maybe.andThen .ajaxParams |> Maybe.withDefault (defaultParams "")) False (map (\s -> { s | list = [] }) newModel) ] )
+
+        SelectTwoOpen dd (Err _) ->
+            ( { model | selectTwo = Nothing }
+            , Cmd.none
             )
 
         SelectTwoHovered hovered ->
@@ -189,9 +201,29 @@ ajaxCmd sender ajaxParams reset model =
 
 {-| Create a new instance of the selectTwo record in your model
 -}
-new : List String -> SelectTwoDropdown msg -> Model b msg -> Model b msg
-new parents dropdown model =
-    { model | selectTwo = Just { dropdown = dropdown, hovered = Nothing, search = Nothing, parents = parents, list = [], ajaxParams = Just <| defaultParams "", ajax = dropdown.ajax, id_ = dropdown.id_ } }
+new : SelectTwoDropdown msg -> Model b msg -> Model b msg
+new dropdown model =
+    { model | selectTwo = Just { dropdown = dropdown, hovered = Nothing, search = Nothing, list = [], ajaxParams = Just <| defaultParams "", ajax = dropdown.ajax, id_ = dropdown.id_ } }
+
+
+updateDropdown : Dom.Element -> Model b msg -> Model b msg
+updateDropdown elem model =
+    let
+        selectTwo =
+            model.selectTwo
+                |> Maybe.map
+                    (\st ->
+                        let
+                            dropdown =
+                                st.dropdown
+
+                            newDropdown =
+                                { dropdown | x = elem.element.x, y = elem.element.y + elem.element.height, width = elem.element.width }
+                        in
+                        { st | dropdown = newDropdown }
+                    )
+    in
+    { model | selectTwo = selectTwo }
 
 
 {-| modify selectTwo record in your model

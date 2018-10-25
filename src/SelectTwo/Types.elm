@@ -17,7 +17,8 @@ import Http
 {-| Command Messages for SelectTwo
 -}
 type SelectTwoMsg msg
-    = SelectTwoTrigger (List String) (SelectTwoDropdown msg)
+    = SelectTwoTrigger (SelectTwoDropdown msg)
+    | SelectTwoOpen (SelectTwoDropdown msg) (Result Dom.Error Dom.Element)
     | SelectTwoHovered (Maybe msg)
     | SelectTwoSelected (Maybe msg)
     | SetSelectTwoSearch String
@@ -41,7 +42,6 @@ type alias SelectTwoConfig msg =
     { defaults : List (SelectTwoOption msg)
     , id_ : String
     , list : List (GroupSelectTwoOption msg)
-    , parents : List String
     , clearMsg : Maybe (Maybe msg -> msg)
     , showSearch : Bool
     , width : String
@@ -83,7 +83,6 @@ type alias SelectTwo msg =
     { dropdown : SelectTwoDropdown msg
     , hovered : Maybe msg
     , search : Maybe String
-    , parents : List String
     , list : List (GroupSelectTwoOption msg)
     , ajax : Bool
     , id_ : String

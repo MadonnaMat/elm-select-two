@@ -23,7 +23,7 @@ import Html.Events exposing (onClick, onInput)
 import Json.Decode as JD
 import List.Extra
 import SelectTwo
-import SelectTwo.Private exposing (boolToString, filterGroup, filterList, location, px, tuple3Second, uniqueBy)
+import SelectTwo.Private exposing (boolToString, filterGroup, filterList, flip, location, px, tuple3Second, uniqueBy)
 import SelectTwo.Types
     exposing
         ( AjaxParams
@@ -66,7 +66,6 @@ select2Close sender =
         { defaults = SelectTwo.defaultsFromList [ Test model.test ] <| testList Test
         , id_ = "test-1"
         , list = testList Test
-        , parents = [ "parent" ]
         , clearMsg = Just (\_ -> Test Nothing)
         , width = "300px"
         , placeholder = "Select Test"
@@ -79,7 +78,7 @@ select2Close sender =
 
 -}
 select2 : (SelectTwoMsg msg -> msg) -> SelectTwoConfig msg -> Html msg
-select2 sender { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, noResultsMessage, ajax, delay, closeOnClear } =
+select2 sender { defaults, list, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, noResultsMessage, ajax, delay, closeOnClear } =
     span
         [ classList
             [ ( "select2 elm-select2 select2-container select2-container--default select2-container--below select2-container--focus", True )
@@ -88,7 +87,7 @@ select2 sender { defaults, list, parents, clearMsg, showSearch, width, placehold
         , id id_
         , style "width" width
         , if not disabled then
-            Html.Events.custom "click" <| location id_ sender defaults list parents (showSearch && not multiSelect) noResultsMessage ajax delay
+            Html.Events.custom "click" <| location id_ sender defaults list (showSearch && not multiSelect) noResultsMessage ajax delay
 
           else
             attribute "data-blank" ""
@@ -343,16 +342,17 @@ preventAndStop msg =
         }
 
 
-{-| Select2 only works when a parent div is not scrollable, this makes parent divs not scrollable while the dropdown is open
+{-| Select2 only works when a parent div is not scrollable, this makes divs not scrollable while the dropdown is open
+first argument is a list of select2 ids you don't want to scroll by
 -}
-preventScrolling : String -> Model b msg -> List ( String, String )
-preventScrolling name model =
+preventScrolling : List String -> Model b msg -> List ( String, String )
+preventScrolling ids model =
     let
         prevent =
             model.selectTwo
-                |> Maybe.map .parents
-                |> Maybe.withDefault []
-                |> List.member name
+                |> Maybe.map .id_
+                |> Maybe.map (flip List.member ids)
+                |> Maybe.withDefault False
     in
     if prevent then
         [ ( "overflow", "hidden" ) ]

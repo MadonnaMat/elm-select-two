@@ -83,7 +83,7 @@ select2Close sender =
 
 -}
 select2 : (SelectTwoMsg msg -> msg) -> SelectTwoConfig msg -> Html msg
-select2 sender { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, noResultsMessage, ajax, delay } =
+select2 sender { defaults, list, parents, clearMsg, showSearch, width, placeholder, id_, disabled, multiSelect, noResultsMessage, ajax, delay, closeOnClear } =
     span
         [ classList
             [ ( "select2 elm-select2 select2-container select2-container--default select2-container--below select2-container--focus", True )
@@ -98,15 +98,15 @@ select2 sender { defaults, list, parents, clearMsg, showSearch, width, placehold
         ]
         [ span [ class "selection" ]
             [ if multiSelect then
-                multiSelectSpan sender id_ defaults list clearMsg disabled placeholder ajax
+                multiSelectSpan sender id_ defaults list clearMsg closeOnClear disabled placeholder ajax
               else
-                singleSelectSpan (defaults |> List.head) clearMsg placeholder
+                singleSelectSpan sender (defaults |> List.head) clearMsg closeOnClear placeholder
             ]
         ]
 
 
-singleSelectSpan : Maybe (SelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> String -> Html msg
-singleSelectSpan default clearMsg placeholder =
+singleSelectSpan : (SelectTwoMsg msg -> msg) -> Maybe (SelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> Bool -> String -> Html msg
+singleSelectSpan sender default clearMsg closeOnClear placeholder =
     let
         ( defaultMsg, defaultText, _ ) =
             default |> Maybe.withDefault ( Nothing, "", False )
@@ -118,7 +118,14 @@ singleSelectSpan default clearMsg placeholder =
                   else
                     case clearMsg of
                         Just msg ->
-                            span [ class "select2-selection__clear", onClick (msg defaultMsg) ] [ text "×" ]
+                            if closeOnClear then
+                                span
+                                    [ class "select2-selection__clear"
+                                    , Html.Events.onWithOptions "click" preventAndStop (JD.succeed (sender <| SelectTwoSelected <| Just (msg defaultMsg)))
+                                    ]
+                                    [ text "×" ]
+                            else
+                                span [ class "select2-selection__clear", onClick (msg defaultMsg) ] [ text "×" ]
 
                         Nothing ->
                             text ""
@@ -128,8 +135,8 @@ singleSelectSpan default clearMsg placeholder =
             ]
 
 
-multiSelectSpan : (SelectTwoMsg msg -> msg) -> String -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> Bool -> String -> Bool -> Html msg
-multiSelectSpan sender id_ defaults list clearMsg disabled placeholder ajax =
+multiSelectSpan : (SelectTwoMsg msg -> msg) -> String -> List (SelectTwoOption msg) -> List (GroupSelectTwoOption msg) -> Maybe (Maybe msg -> msg) -> Bool -> Bool -> String -> Bool -> Html msg
+multiSelectSpan sender id_ defaults list clearMsg closeOnClear disabled placeholder ajax =
     let
         theList =
             if ajax then
@@ -147,7 +154,14 @@ multiSelectSpan sender id_ defaults list clearMsg disabled placeholder ajax =
                             li [ class "select2-selection__choice" ]
                                 [ case clearMsg of
                                     Just clrMsg ->
-                                        span [ class "select2-selection__choice__remove", onClick (clrMsg msg) ] [ text "×" ]
+                                        if closeOnClear then
+                                            span
+                                                [ class "select2-selection__choice__remove"
+                                                , Html.Events.onWithOptions "click" preventAndStop (JD.succeed (sender <| SelectTwoSelected <| Just (clrMsg msg)))
+                                                ]
+                                                [ text "×" ]
+                                        else
+                                            span [ class "select2-selection__choice__remove", onClick (clrMsg msg) ] [ text "×" ]
 
                                     Nothing ->
                                         text ""

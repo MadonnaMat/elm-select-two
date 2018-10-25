@@ -1,15 +1,15 @@
-module Main exposing (..)
+module Main exposing (Item, Model, Msg(..), customHtml, init, itemsDecoder, main, processResult, sendAjax, subscriptions, testList, testList2, testList3, update, view)
 
-import Html exposing (Html, program, text, div, span, p, h1)
+import Browser exposing (Document, document)
+import Html exposing (Html, div, h1, p, span, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Http
+import Json.Decode as JD
 import SelectTwo exposing (..)
 import SelectTwo.Html exposing (..)
 import SelectTwo.Types exposing (..)
 import Task
-import Tuple3
-import Json.Decode as JD
-import Http
 
 
 type alias Model =
@@ -22,16 +22,17 @@ type alias Model =
     }
 
 
-init : ( Model, Cmd Msg )
-init =
-    { selectTwo = Nothing
-    , test = Nothing
-    , test2 = Nothing
-    , test3 = []
-    , test4 = Nothing
-    , test5 = []
-    }
-        ! []
+init : flags -> ( Model, Cmd Msg )
+init flags =
+    ( { selectTwo = Nothing
+      , test = Nothing
+      , test2 = Nothing
+      , test3 = []
+      , test4 = Nothing
+      , test5 = []
+      }
+    , Cmd.none
+    )
 
 
 type Msg
@@ -59,46 +60,72 @@ update msg model =
                         (\id_ params reset ->
                             case id_ of
                                 "test-4" ->
-                                    model ! [ SelectTwo.send <| Test4Ajax params reset ]
+                                    ( model
+                                    , SelectTwo.send <| Test4Ajax params reset
+                                    )
 
                                 "test-5" ->
-                                    model ! [ SelectTwo.send <| Test5Ajax params reset ]
+                                    ( model
+                                    , SelectTwo.send <| Test5Ajax params reset
+                                    )
 
                                 _ ->
-                                    model ! []
+                                    ( model
+                                    , Cmd.none
+                                    )
                         )
             in
-                SelectTwo.update (SelectTwo) stmsg ajaxCases model
+            SelectTwo.update SelectTwo stmsg ajaxCases model
 
         Test s ->
-            { model | test = s } ! []
+            ( { model | test = s }
+            , Cmd.none
+            )
 
         Test2 s ->
-            { model | test2 = s } ! []
+            ( { model | test2 = s }
+            , Cmd.none
+            )
 
         Test3 s ->
-            { model | test3 = s :: model.test3 } ! []
+            ( { model | test3 = s :: model.test3 }
+            , Cmd.none
+            )
 
         Test4 s ->
-            { model | test4 = s } ! []
+            ( { model | test4 = s }
+            , Cmd.none
+            )
 
         Test5 (Just s) ->
-            { model | test5 = s :: model.test5 } ! []
+            ( { model | test5 = s :: model.test5 }
+            , Cmd.none
+            )
 
         Test5 _ ->
-            model ! []
+            ( model
+            , Cmd.none
+            )
 
         Test3Clear (Just (Test3 s)) ->
-            { model | test3 = model.test3 |> (List.filter ((/=) s)) } ! []
+            ( { model | test3 = model.test3 |> List.filter ((/=) s) }
+            , Cmd.none
+            )
 
         Test5Clear (Just (Test5 (Just s))) ->
-            { model | test5 = model.test5 |> (List.filter ((/=) s)) } ! []
+            ( { model | test5 = model.test5 |> List.filter ((/=) s) }
+            , Cmd.none
+            )
 
         Test3Clear _ ->
-            model ! []
+            ( model
+            , Cmd.none
+            )
 
         Test5Clear _ ->
-            model ! []
+            ( model
+            , Cmd.none
+            )
 
         Test4Ajax params reset ->
             let
@@ -110,22 +137,29 @@ update msg model =
                         term =
                             if params.term == "" then
                                 "test"
+
                             else
                                 params.term
                     in
-                        (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
+                    url ++ "?q=" ++ term ++ "&page=" ++ String.fromInt params.page
             in
-                SelectTwo.setLoading params reset model ! [ sendAjax buildUrl (Test4Res params) ]
+            ( SelectTwo.setLoading params reset model
+            , sendAjax buildUrl (Test4Res params)
+            )
 
         Test4Res params (Ok str) ->
             let
                 ( list, newParams ) =
                     processResult Test4 str params
             in
-                SelectTwo.setList list newParams model ! []
+            ( SelectTwo.setList list newParams model
+            , Cmd.none
+            )
 
         Test4Res params (Err _) ->
-            model ! []
+            ( model
+            , Cmd.none
+            )
 
         Test5Ajax params reset ->
             let
@@ -137,22 +171,29 @@ update msg model =
                         term =
                             if params.term == "" then
                                 "test"
+
                             else
                                 params.term
                     in
-                        (url ++ "?q=" ++ term ++ "&page=" ++ (toString params.page))
+                    url ++ "?q=" ++ term ++ "&page=" ++ String.fromInt params.page
             in
-                SelectTwo.setLoading params reset model ! [ sendAjax buildUrl (Test5Res params) ]
+            ( SelectTwo.setLoading params reset model
+            , sendAjax buildUrl (Test5Res params)
+            )
 
         Test5Res params (Ok str) ->
             let
                 ( list, newParams ) =
                     processResult Test5 str params
             in
-                SelectTwo.setList list newParams model ! []
+            ( SelectTwo.setList list newParams model
+            , Cmd.none
+            )
 
         Test5Res params (Err _) ->
-            model ! []
+            ( model
+            , Cmd.none
+            )
 
 
 sendAjax : String -> (Result Http.Error String -> Msg) -> Cmd Msg
@@ -161,12 +202,12 @@ sendAjax url msg =
         |> Http.send msg
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    program
+    document
         { init = init
         , update = update
-        , view = view
+        , view = topView
         , subscriptions = subscriptions
         }
 
@@ -176,15 +217,20 @@ subscriptions model =
     Sub.none
 
 
+topView : Model -> Document Msg
+topView model =
+    { title = "elm-select-two"
+    , body = [ view model ]
+    }
+
+
 view : Model -> Html Msg
 view model =
     div
-        [ style
-            [ ( "width", "100%" )
-            , ( "height", "100%" )
-            , ( "padding", "30px" )
-            , ( "font-size", "16px" )
-            ]
+        [ style "width" "100%"
+        , style "height" "100%"
+        , style "padding" "30px"
+        , style "font-size" "16px"
         , select2Close SelectTwo
         ]
         [ select2Css
@@ -210,7 +256,7 @@ view model =
                     }
                 ]
             ]
-        , p [ class "p1", style [ ( "position", "relative" ) ] ]
+        , p [ class "p1", style "position" "relative" ]
             [ text "Multiple Groups, Single Select, Relative Parent, Close On Clear"
             , div []
                 [ select2 SelectTwo
@@ -233,11 +279,9 @@ view model =
             ]
         , p
             [ class "p2"
-            , style
-                [ ( "position", "absolute" )
-                , ( "top", "6em" )
-                , ( "right", "50px" )
-                ]
+            , style "position" "absolute"
+            , style "top" "6em"
+            , style "right" "50px"
             ]
             [ text "Single Group, Multi-Select, Custom Rows, Position Absolute, Close On Clear"
             , div []
@@ -307,20 +351,18 @@ view model =
 
 processResult : (Maybe { id : Int, name : String } -> Msg) -> String -> AjaxParams -> ( List (GroupSelectTwoOption Msg), AjaxParams )
 processResult msg string params =
-    (JD.decodeString
-        ((JD.map2 (,)
+    JD.decodeString
+        (JD.map2 (\a b -> ( a, b ))
             (JD.at [ "items" ] (JD.list itemsDecoder))
             (JD.field "total_count" JD.int)
-         )
             |> JD.map
                 (\( items, total_count ) ->
                     ( items |> List.map (\i -> ( Just i, i.name )) |> SelectTwo.basicSelectOptions msg
-                    , { params | more = (params.page * 30 < total_count) }
+                    , { params | more = params.page * 30 < total_count }
                     )
                 )
         )
         string
-    )
         |> Result.toMaybe
         |> Maybe.withDefault ( [], params )
 
@@ -332,8 +374,8 @@ type alias Item =
 itemsDecoder : JD.Decoder Item
 itemsDecoder =
     JD.map2 Item
-        (JD.field ("id") JD.int)
-        (JD.field ("name") JD.string)
+        (JD.field "id" JD.int)
+        (JD.field "name" JD.string)
 
 
 testList : (Maybe String -> Msg) -> List ( String, List (SelectTwoOption Msg) )
@@ -378,11 +420,9 @@ customHtml ( msg, txt, sel ) =
         Just (Test3 _) ->
             Just <|
                 span
-                    [ style
-                        [ ( "width", "100%" )
-                        , ( "text-align", "center" )
-                        , ( "display", "inline-block" )
-                        ]
+                    [ style "width" "100%"
+                    , style "text-align" "center"
+                    , style "display" "inline-block"
                     ]
                     [ text txt
                     ]

@@ -1,17 +1,17 @@
-module SelectTwo.Types exposing (..)
+module SelectTwo.Types exposing (SelectTwoConfig, SelectTwoMsg(..), Model, SelectTwo, SelectTwoDropdown, GroupSelectTwoOption, SelectTwoOption, AjaxParams, ScrollInfo)
 
 {-| SelectTwo Types
 
 
 # Types
 
-@docs SelectTwoConfig, SelectTwoMsg, Model,SelectTwo, SelectTwoDropdown, GroupSelectTwoOption, SelectTwoOption, AjaxParams, ScrollInfo
+@docs SelectTwoConfig, SelectTwoMsg, Model, SelectTwo, SelectTwoDropdown, GroupSelectTwoOption, SelectTwoOption, AjaxParams, ScrollInfo
 
 -}
 
-import Dom
-import Http
+import Browser.Dom as Dom
 import Html exposing (Html)
+import Http
 
 
 {-| Command Messages for SelectTwo
@@ -71,7 +71,7 @@ type alias GroupSelectTwoOption msg =
     ( String, List (SelectTwoOption msg) )
 
 
-{-| Rows in a select table, first option is the command message to be sent, second is the html to be displayed, and third is the string to search on, and the fourth is if it is disabled or not
+{-| Rows in a select table, first option is the command message to be sent, second is the html to be displayed and the string to search on, and the third is if it is disabled or not
 -}
 type alias SelectTwoOption msg =
     ( Maybe msg, String, Bool )

@@ -51,6 +51,7 @@ type alias SelectTwoConfig msg =
     , noResultsMessage : Maybe String
     , ajax : Bool
     , delay : Float
+    , closeOnClear : Bool
     }
 
 

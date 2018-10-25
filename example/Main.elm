@@ -206,11 +206,12 @@ view model =
                     , ajax = False
                     , delay = 0
                     , noResultsMessage = Nothing
+                    , closeOnClear = False
                     }
                 ]
             ]
         , p [ class "p1", style [ ( "position", "relative" ) ] ]
-            [ text "Multiple Groups, Single Select, Relative Parent"
+            [ text "Multiple Groups, Single Select, Relative Parent, Close On Clear"
             , div []
                 [ select2 SelectTwo
                     { defaults = SelectTwo.defaultsFromList [ Test2 model.test2 ] <| testList2 Test2
@@ -226,6 +227,7 @@ view model =
                     , ajax = False
                     , delay = 0
                     , noResultsMessage = Nothing
+                    , closeOnClear = True
                     }
                 ]
             ]
@@ -237,7 +239,7 @@ view model =
                 , ( "right", "50px" )
                 ]
             ]
-            [ text "Single Group, Multi-Select, Custom Rows, Position Absolute"
+            [ text "Single Group, Multi-Select, Custom Rows, Position Absolute, Close On Clear"
             , div []
                 [ select2 SelectTwo
                     { defaults = SelectTwo.defaultsFromList (model.test3 |> List.map Test3) <| testList3 Test3
@@ -253,6 +255,7 @@ view model =
                     , ajax = False
                     , delay = 0
                     , noResultsMessage = Nothing
+                    , closeOnClear = True
                     }
                 ]
             ]
@@ -273,6 +276,7 @@ view model =
                     , multiSelect = False
                     , disabled = model.test2 == Just "a"
                     , noResultsMessage = Just "YOU GET NOTHING! YOU LOSE GOODDAY SIR!"
+                    , closeOnClear = False
                     }
                 ]
             ]
@@ -293,6 +297,7 @@ view model =
                     , multiSelect = True
                     , disabled = model.test2 == Just "a"
                     , noResultsMessage = Nothing
+                    , closeOnClear = False
                     }
                 ]
             ]

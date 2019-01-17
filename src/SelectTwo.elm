@@ -133,6 +133,11 @@ update sender msg maybeAjax model =
             , Cmd.none
             )
 
+        ForceMajor ->
+            ( model
+            , Cmd.none
+            )
+
         SentAjax id_ params reset ->
             maybeAjax
                 |> Maybe.map (\a -> uncurry3 a ( id_, params, reset ))

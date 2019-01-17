@@ -28,6 +28,7 @@ type SelectTwoMsg msg
     | STNull
     | SentAjax String AjaxParams Bool
     | ResultScroll ScrollInfo
+    | ForceMajor
 
 
 {-| Model structure needed for selectTwo, all records using selectTwo should have this structure

@@ -3,7 +3,7 @@
     "name": "MadonnaMat/elm-select-two",
     "summary": "A mimic of Select2 in Elm",
     "license": "MIT",
-    "version": "5.0.0",
+    "version": "4.0.0",
     "exposed-modules": [
         "SelectTwo",
         "SelectTwo.Types",

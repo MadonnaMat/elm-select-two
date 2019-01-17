@@ -1,8 +1,13 @@
-module SelectTwo exposing (update, new, map, setSearch, basicSelectOptions, basicGroupSelectOptions, send, setLoading, setList, defaultsFromList)
+module SelectTwo exposing
+    ( update, new, map, setSearch
+    , setLoading, setList
+    , basicSelectOptions, basicGroupSelectOptions, defaultsFromList, send
+    )
 
 {-| This library is the basic controls for your model's select2 object and some helper methods
 
 #Basic Controls
+
 @docs update, new, map, setSearch
 
 
@@ -17,17 +22,16 @@ module SelectTwo exposing (update, new, map, setSearch, basicSelectOptions, basi
 
 -}
 
-import SelectTwo.Types exposing (SelectTwoMsg(..), SelectTwo, SelectTwoDropdown, SelectTwoOption, AjaxParams, GroupSelectTwoOption, Model)
-import SelectTwo.Private exposing (filterList, filterGroup, px, asTuple, defaultParams, uncurry3)
+import Browser.Dom as Dom
+import Html exposing (text)
 import Json.Decode as JD
 import List.Extra
-import Task
-import Tuple
-import Tuple3
-import Dom
 import Process
+import SelectTwo.Private exposing (asTuple, defaultParams, filterGroup, filterList, groupWhile, px, tuple3First, tuple3Init, tuple3Third, uncurry3)
+import SelectTwo.Types exposing (AjaxParams, GroupSelectTwoOption, Model, SelectTwo, SelectTwoDropdown, SelectTwoMsg(..), SelectTwoOption)
+import Task
 import Time
-import Html exposing (text)
+import Tuple
 
 
 {-| used in your elm project's update as a way to control the select two boxes on screen it is used by
@@ -40,69 +44,98 @@ import Html exposing (text)
                     (\id_ params reset ->
                         case id_ of
                             "test-4" ->
-                                model ! [ SelectTwo.send <| TestAjax params reset ]
+                                ( model
+                                , SelectTwo.send <| TestAjax params reset
+                                )
 
                             _ ->
-                                model ! []
+                                ( model
+                                , Cmd.none
+                                )
                     )
         in
-            SelectTwo.update (SelectTwo) stmsg ajaxSend model
+        SelectTwo.update SelectTwo stmsg ajaxSend model
 
 -}
 update : (SelectTwoMsg msg -> msg) -> SelectTwoMsg msg -> Maybe (String -> AjaxParams -> Bool -> ( Model b msg, Cmd msg )) -> Model b msg -> ( Model b msg, Cmd msg )
 update sender msg maybeAjax model =
     case msg of
-        SelectTwoTrigger p dd ->
+        SelectTwoTrigger dd ->
             let
                 newModel =
-                    new p dd model
+                    new dd model
             in
-                newModel ! [ Dom.focus ((dd.id_) ++ "--search") |> Task.attempt (STRes >> (sender)), ajaxCmd sender (newModel.selectTwo |> Maybe.andThen .ajaxParams |> Maybe.withDefault (defaultParams "")) False (map (\s -> { s | list = [] }) newModel) ]
+            ( newModel
+            , Dom.getElement dd.id_ |> Task.attempt (SelectTwoOpen dd >> sender)
+            )
+
+        SelectTwoOpen dd (Ok elem) ->
+            let
+                newModel =
+                    updateDropdown elem model
+            in
+            ( newModel, Cmd.batch [ Dom.focus (dd.id_ ++ "--search") |> Task.attempt (STRes >> sender), ajaxCmd sender (newModel.selectTwo |> Maybe.andThen .ajaxParams |> Maybe.withDefault (defaultParams "")) False (map (\s -> { s | list = [] }) newModel) ] )
+
+        SelectTwoOpen dd (Err _) ->
+            ( { model | selectTwo = Nothing }
+            , Cmd.none
+            )
 
         SelectTwoHovered hovered ->
-            map (\s -> { s | hovered = hovered }) model ! []
+            ( map (\s -> { s | hovered = hovered }) model
+            , Cmd.none
+            )
 
-        SelectTwoSelected msg ->
-            { model | selectTwo = Nothing } ! [ msg |> Maybe.map send |> Maybe.withDefault Cmd.none ]
+        SelectTwoSelected mg ->
+            ( { model | selectTwo = Nothing }
+            , mg |> Maybe.map send |> Maybe.withDefault Cmd.none
+            )
 
         SetSelectTwoSearch filter ->
-            setSearch filter model
-                ! [ model.selectTwo
-                        |> Maybe.map .dropdown
-                        |> Maybe.andThen (\dd -> delayedSend (dd.delay) ((sender) (DelayedSelectTwoAjax filter)) |> Just)
-                        |> Maybe.withDefault Cmd.none
-                  ]
+            ( setSearch filter model
+            , model.selectTwo
+                |> Maybe.map .dropdown
+                |> Maybe.andThen (\dd -> delayedSend dd.delay (sender (DelayedSelectTwoAjax filter)) |> Just)
+                |> Maybe.withDefault Cmd.none
+            )
 
         DelayedSelectTwoAjax filter ->
-            model
-                ! [ model.selectTwo
-                        |> Maybe.map .search
-                        |> Maybe.andThen identity
-                        |> Maybe.andThen
-                            (\search ->
-                                if search == filter then
-                                    ajaxCmd sender (defaultParams filter) True (map (\s -> { s | list = [] }) model) |> Just
-                                else
-                                    Nothing
-                            )
-                        |> Maybe.withDefault Cmd.none
-                  ]
+            ( model
+            , model.selectTwo
+                |> Maybe.map .search
+                |> Maybe.andThen identity
+                |> Maybe.andThen
+                    (\search ->
+                        if search == filter then
+                            ajaxCmd sender (defaultParams filter) True (map (\s -> { s | list = [] }) model) |> Just
+
+                        else
+                            Nothing
+                    )
+                |> Maybe.withDefault Cmd.none
+            )
 
         ResultScroll { scrollHeight, scrollTop } ->
             checkScrollPage scrollTop scrollHeight sender model
 
-        STMsg msg ->
-            model ! [ send msg ]
+        STMsg mg ->
+            ( model
+            , send mg
+            )
 
         STRes a ->
-            model ! []
+            ( model
+            , Cmd.none
+            )
 
         STNull ->
-            model ! []
+            ( model
+            , Cmd.none
+            )
 
         SentAjax id_ params reset ->
             maybeAjax
-                |> Maybe.map (flip uncurry3 ( id_, params, reset ))
+                |> Maybe.map (\a -> uncurry3 a ( id_, params, reset ))
                 |> Maybe.withDefault ( model, Cmd.none )
 
 
@@ -121,7 +154,11 @@ sendPageIncrement sender model scrollTop scrollHeight ajaxParams =
             newModel =
                 map (\s -> { s | ajaxParams = Just { ajaxParams | page = ajaxParams.page + 1 } }) model
         in
-            Just (newModel ! [ ajaxCmd sender (newModel.selectTwo |> Maybe.andThen .ajaxParams |> Maybe.withDefault (defaultParams "")) False newModel ])
+        Just
+            ( newModel
+            , ajaxCmd sender (newModel.selectTwo |> Maybe.andThen .ajaxParams |> Maybe.withDefault (defaultParams "")) False newModel
+            )
+
     else
         Nothing
 
@@ -130,17 +167,17 @@ incrementPage : Int -> Int -> AjaxParams -> Bool
 incrementPage scrollTop scrollHeight params =
     let
         scrollPageHeight =
-            (toFloat scrollHeight) / (toFloat params.page)
+            toFloat scrollHeight / toFloat params.page
 
         scrollPageTop =
-            (toFloat scrollTop) - (toFloat scrollHeight) + scrollPageHeight
+            toFloat scrollTop - toFloat scrollHeight + scrollPageHeight
     in
-        scrollPageTop / scrollPageHeight > 0.7 && (not params.loading) && params.more
+    scrollPageTop / scrollPageHeight > 0.7 && not params.loading && params.more
 
 
 delayedSend : Float -> msg -> Cmd msg
 delayedSend milli msg =
-    Process.sleep (Time.millisecond * milli)
+    Process.sleep (1000 * milli)
         |> Task.perform (\_ -> msg)
 
 
@@ -151,6 +188,7 @@ ajaxCmd sender ajaxParams reset model =
             (\st ->
                 if st.ajax then
                     Just st.id_
+
                 else
                     Nothing
             )
@@ -163,9 +201,29 @@ ajaxCmd sender ajaxParams reset model =
 
 {-| Create a new instance of the selectTwo record in your model
 -}
-new : List String -> SelectTwoDropdown msg -> Model b msg -> Model b msg
-new parents dropdown model =
-    { model | selectTwo = Just { dropdown = dropdown, hovered = Nothing, search = Nothing, parents = parents, list = [], ajaxParams = Just <| defaultParams "", ajax = dropdown.ajax, id_ = dropdown.id_ } }
+new : SelectTwoDropdown msg -> Model b msg -> Model b msg
+new dropdown model =
+    { model | selectTwo = Just { dropdown = dropdown, hovered = Nothing, search = Nothing, list = [], ajaxParams = Just <| defaultParams "", ajax = dropdown.ajax, id_ = dropdown.id_ } }
+
+
+updateDropdown : Dom.Element -> Model b msg -> Model b msg
+updateDropdown elem model =
+    let
+        selectTwo =
+            model.selectTwo
+                |> Maybe.map
+                    (\st ->
+                        let
+                            dropdown =
+                                st.dropdown
+
+                            newDropdown =
+                                { dropdown | x = elem.element.x, y = elem.element.y + elem.element.height, width = elem.element.width }
+                        in
+                        { st | dropdown = newDropdown }
+                    )
+    in
+    { model | selectTwo = selectTwo }
 
 
 {-| modify selectTwo record in your model
@@ -176,7 +234,7 @@ map f model =
         newSelectTwo =
             model.selectTwo |> Maybe.map f
     in
-        { model | selectTwo = newSelectTwo }
+    { model | selectTwo = newSelectTwo }
 
 
 {-| set the search parameter in your selectTwo record
@@ -187,10 +245,11 @@ setSearch filter =
         search =
             if filter == "" then
                 Nothing
+
             else
                 Just filter
     in
-        map (\s -> { s | search = search })
+    map (\s -> { s | search = search })
 
 
 {-| Quick helper method for sending a message and running through your update function agian
@@ -198,10 +257,14 @@ setSearch filter =
     update msg model =
         case msg of
             Test1 ->
-                model ! [ SelectTwo.send Test2 ]
+                ( model
+                , SelectTwo.send Test2
+                )
 
             Test2 ->
-                model ! []
+                ( model
+                , Cmd.none
+                )
 
 -}
 send : msg -> Cmd msg
@@ -228,9 +291,9 @@ basicSelectOptions msg list =
 {-| turn a list of Tuples3 into a list of GroupSelectTwoOptions with actual grouping. The first parameter is their shared trigger message, the
 second parameter is the list of tuples which are formatted as (Key, "Display", "Group Name"), and the return can be used in the list option of the config
 
-    [ ( Just "a", "a", "Group 1")
-    , ( Just "b", "b", "Group 1")
-    , ( Just "c", "c", "Group 2")
+    [ ( Just "a", "a", "Group 1" )
+    , ( Just "b", "b", "Group 1" )
+    , ( Just "c", "c", "Group 2" )
     ]
         |> SelectTwo.basicSelectOptions Test
 
@@ -238,7 +301,7 @@ second parameter is the list of tuples which are formatted as (Key, "Display", "
 basicGroupSelectOptions : (a -> msg) -> List ( a, String, String ) -> List (GroupSelectTwoOption msg)
 basicGroupSelectOptions msg list =
     list
-        |> List.Extra.groupWhile (\( _, _, a ) ( _, _, b ) -> a == b)
+        |> groupWhile (\( _, _, a ) ( _, _, b ) -> a == b)
         |> List.map (selectGroup msg)
 
 
@@ -246,9 +309,9 @@ selectGroup : (a -> msg) -> List ( a, String, String ) -> GroupSelectTwoOption m
 selectGroup msg list =
     ( list
         |> List.head
-        |> Maybe.map Tuple3.third
+        |> Maybe.map tuple3Third
         |> Maybe.withDefault ""
-    , List.map (Tuple3.init >> (selectOption msg)) list
+    , List.map (tuple3Init >> selectOption msg) list
     )
 
 
@@ -283,18 +346,19 @@ setLoading ajaxParams reset model =
         list =
             model.selectTwo |> Maybe.map .list |> Maybe.withDefault []
     in
-        map
-            (\s ->
-                { s
-                    | list =
-                        if reset then
-                            []
-                        else
-                            list
-                    , ajaxParams = Just { ajaxParams | loading = True }
-                }
-            )
-            model
+    map
+        (\s ->
+            { s
+                | list =
+                    if reset then
+                        []
+
+                    else
+                        list
+                , ajaxParams = Just { ajaxParams | loading = True }
+            }
+        )
+        model
 
 
 {-| Set the list from the return of your ajax command
@@ -315,15 +379,14 @@ setList list ajaxParams model =
 
         newList =
             tempList
-                |> List.Extra.groupWhile (\x y -> Tuple.first x == Tuple.first y)
-                |> (List.map
-                        (asTuple
-                            (List.head >> Maybe.map (Tuple.first) >> Maybe.withDefault "")
-                            (List.map (Tuple.second) >> List.concat)
-                        )
-                   )
+                |> groupWhile (\x y -> Tuple.first x == Tuple.first y)
+                |> List.map
+                    (asTuple
+                        (List.head >> Maybe.map Tuple.first >> Maybe.withDefault "")
+                        (List.map Tuple.second >> List.concat)
+                    )
     in
-        map (\s -> { s | list = newList, ajaxParams = Just { ajaxParams | loading = False } }) model
+    map (\s -> { s | list = newList, ajaxParams = Just { ajaxParams | loading = False } }) model
 
 
 {-| Quick helper way of getting defaults list from a GroupSelectTwoOption list
@@ -335,7 +398,7 @@ defaultsFromList defaults list =
         |> List.filter
             (\l ->
                 l
-                    |> Tuple3.first
-                    |> Maybe.map (flip List.member defaults)
+                    |> tuple3First
+                    |> Maybe.map (\a -> List.member a defaults)
                     |> Maybe.withDefault False
             )

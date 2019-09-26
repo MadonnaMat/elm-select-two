@@ -177,7 +177,7 @@ incrementPage scrollTop scrollHeight params =
 
 delayedSend : Float -> msg -> Cmd msg
 delayedSend milli msg =
-    Process.sleep (1000 * milli)
+    Process.sleep milli
         |> Task.perform (\_ -> msg)
 
 

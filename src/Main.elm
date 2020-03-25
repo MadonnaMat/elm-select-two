@@ -198,9 +198,10 @@ update msg model =
 
 sendAjax : String -> (Result Http.Error String -> Msg) -> Cmd Msg
 sendAjax url msg =
-    Http.getString url
-        |> Http.send msg
-
+    Http.get
+        { url = url
+        , expect = Http.expectString msg
+        }
 
 main : Program () Model Msg
 main =
